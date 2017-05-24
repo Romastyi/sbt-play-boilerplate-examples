@@ -55,6 +55,8 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/errorModel'
+      security:
+      - session:
     post:
       description: Creates a new pet in the store.  Duplicates are allowed
       operationId: addPet
@@ -76,6 +78,10 @@ paths:
           description: unexpected error
           schema:
             $ref: '#/definitions/errorModel'
+      security:
+      - session:
+        - "roles:admin,api"
+        - "capability:some"
   /pets/{id}:
     get:
       description: Returns a user based on a single ID, if the user does not have access to the pet

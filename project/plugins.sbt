@@ -1,17 +1,12 @@
 resolvers += Resolver.sonatypeRepo("releases")
 
-addSbtPlugin("eu.unicredit" % "sbt-swagger-codegen" % "0.0.9")
+addSbtPlugin("eu.unicredit" % "sbt-play-boilerplate" % "0.0.10-SNAPSHOT")
 
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.3")
+/* Play 2.5.x */
+//addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.3")
 
-lazy val myExtensionPlugin = project.
-  in(file("my-extension-plugin")).
-  settings(
-    name := "My Extension Plugin",
-    sbtPlugin := true,
-    libraryDependencies +=
-      "eu.unicredit" %% "sbt-swagger-codegen-lib" % "0.0.9",
-    resolvers += Resolver.sonatypeRepo("releases")
-  )
+/* Play 2.4.x */
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.4.11")
 
-lazy val root = project.in(file(".")).dependsOn(myExtensionPlugin)
+/* Play 2.3.x */
+//addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.10")
