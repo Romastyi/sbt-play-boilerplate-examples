@@ -152,9 +152,18 @@ definitions:
         type: array
         items:
           type: string
+  LogLevels:
+    type: string
+    enum: &LOGLEVELS
+      - trace
+      - debug
+      - info
+      - warning
+      - fatal
   errorModel:
     required:
       - code
+      - uuid
       - message
     properties:
       code:
@@ -162,3 +171,9 @@ definitions:
         format: int32
       message:
         type: string
+      level:
+        type: string
+        enum: *LOGLEVELS
+      uuid:
+        type: string
+        format: uuid
