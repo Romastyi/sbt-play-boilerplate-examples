@@ -36,7 +36,11 @@ paths:
           required: false
           type: array
           items:
+#            $ref: '#/definitions/PetTag'
             type: string
+            enum:
+              - young
+              - mature
           collectionFormat: csv
         - name: limit
           in: query
@@ -125,6 +129,11 @@ paths:
           schema:
             $ref: '#/definitions/errorModel'
 definitions:
+  PetTag:
+    type: string
+    enum: &PETTAG
+      - young
+      - mature
   pet:
     required:
       - id
@@ -138,7 +147,7 @@ definitions:
       tag:
         type: array
         items:
-          type: string
+          $ref: '#/definitions/PetTag'
   newPet:
     required:
       - name
@@ -151,10 +160,10 @@ definitions:
       tag:
         type: array
         items:
-          type: string
-  LogLevels:
+          $ref: '#/definitions/PetTag'
+  LogLevel:
     type: string
-    enum: &LOGLEVELS
+    enum: &LOGLEVEL
       - trace
       - debug
       - info
@@ -173,7 +182,7 @@ definitions:
         type: string
       level:
         type: string
-        enum: *LOGLEVELS
+        enum: *LOGLEVEL
       uuid:
         type: string
         format: uuid

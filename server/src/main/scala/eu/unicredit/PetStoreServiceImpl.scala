@@ -21,7 +21,7 @@ class PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def findPets(tags: Option[List[String]], limit: Option[Int], user: UserModel): Future[FindPetsResponse] = {
+  override def findPets(tags: Option[List[FindPetsTags.Value]], limit: Option[Int], user: UserModel): Future[FindPetsResponse] = {
     println(user)
     Future.successful(FindPetsOk(pets.toList))
   }

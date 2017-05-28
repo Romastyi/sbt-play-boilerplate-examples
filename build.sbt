@@ -36,6 +36,7 @@ lazy val server = project.
   settings(common: _*).
   settings(
     name := "codegen-server",
+    routesImport += "swagger.codegen.controller.PetStoreController._",
     swaggerCodeProvidedPackage := "eu.unicredit",
     swaggerGenerateServer := true,
     swaggerServerRoutesFile := (resourceDirectory in Compile).value / "generated.routes",
