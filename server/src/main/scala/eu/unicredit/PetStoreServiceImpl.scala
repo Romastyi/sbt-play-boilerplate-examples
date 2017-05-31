@@ -59,6 +59,15 @@ class PetStoreServiceImpl extends PetStoreService {
   }
 
   /**
+    * Returns a user based on a single tag, if the user does not have access to the pet
+    *
+    *
+    */
+  override def findPetByTag(tag: PetStoreService.FindPetByTagTag.Value): Future[FindPetByTagResponse] = {
+    Future.successful(FindPetByTagOk(pets.find(_.tag.getOrElse(Nil).contains(tag)).get))
+  }
+
+  /**
     * Error handler
     *
     * @param operationId Operation where error was occurred

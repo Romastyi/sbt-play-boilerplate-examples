@@ -4,4 +4,5 @@ GET                 /api/pets                                                   
 POST                /api/pets                                                   @swagger.codegen.controller.PetStoreController.addPet()
 DELETE              /api/pets/:id                                               @swagger.codegen.controller.PetStoreController.deletePet(id: Long)
 GET                 /api/pets/:id                                               @swagger.codegen.controller.PetStoreController.findPetById(id: Long)
+GET                 /api/pets/:tag                                              @swagger.codegen.controller.PetStoreController.findPetByTag(tag: swagger.codegen.service.PetStoreService.FindPetByTagTag.Value)
 
