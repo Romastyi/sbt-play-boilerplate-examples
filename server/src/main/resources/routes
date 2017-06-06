@@ -1,4 +1,4 @@
 GET         /              eu.unicredit.controller.LoginController.login
 POST        /login         eu.unicredit.controller.LoginController.authenticate
 GET         /logout        eu.unicredit.controller.LoginController.logout
-->          /              generated.Routes
+->          /              petStore.Routes

@@ -7,5 +7,5 @@ package eu.unicredit
 import scaldi.Module
 
 class WebModule extends Module {
-  binding to new _root_.swagger.codegen.controller.PetStoreController()
+  binding to new test.api.controller.PetStoreController()
 }

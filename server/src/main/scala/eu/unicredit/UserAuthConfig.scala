@@ -1,10 +1,9 @@
-package swagger.codegen.controller
+package eu.unicredit
 
 /**
   * Created by romastyi on 06.05.17.
   */
 
-import eu.unicredit.{UserAuthority, UserModel, UserRole}
 import jp.t2v.lab.play2.auth._
 import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
