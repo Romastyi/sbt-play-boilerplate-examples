@@ -10,7 +10,7 @@ import test.api.service.PetStoreService
 import scala.collection.mutable.{Seq => MSeq}
 import scala.concurrent.Future
 
-class PetStoreServiceImpl extends PetStoreService {
+object PetStoreServiceImpl extends PetStoreService {
 
   import PetStoreService._
 
@@ -34,7 +34,7 @@ class PetStoreServiceImpl extends PetStoreService {
   override def addPet(p: NewPet, user: UserModel): Future[AddPetResponse] = {
     println(user)
     val petToAdd = Pet(p.id.getOrElse(0), p.name, p.tag)
-    pets :+= petToAdd
+    pets = pets :+ petToAdd
     Future.successful(AddPetOk(petToAdd))
   }
 
@@ -55,7 +55,11 @@ class PetStoreServiceImpl extends PetStoreService {
     *
     */
   override def findPetById(id: Long): Future[FindPetByIdResponse] = {
-    Future.successful(FindPetByIdOk(pets.find(_.id == id).get))
+    Future.successful(
+      pets.find(_.id == id).map(FindPetByIdOk).getOrElse(
+        FindPetByIdDefault(ErrorModel(100, s"Pet with ID $id not found!", None, java.util.UUID.randomUUID()), 400)
+      )
+    )
   }
 
   /**

@@ -24,5 +24,5 @@ import test.api.service.PetStoreService
 import scaldi.Module
 
 class ServicesModule extends Module {
-  bind [PetStoreService] to new PetStoreServiceImpl
+  bind [PetStoreService] to PetStoreServiceImpl
 }
