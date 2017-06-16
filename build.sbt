@@ -40,14 +40,15 @@ lazy val server = project.
     generatorProvidedPackage := "eu.unicredit",
     generateServer := true,
     generateRoutes := true,
-    generatorSettings := { case (fileName, basePackageName, codeProvidedPackage) =>
-      DefaultGeneratorSettings(
-        fileName,
-        basePackageName,
-        codeProvidedPackage,
-        securityProvider = customSecurityProvider,
-        injectionProvider = new injection.ScaldiInjectionProvider()
-      )
+    generatorSettings := new GenSettings {
+      override def apply(fileName: String, basePackageName: String, codeProvidedPackage: String): GeneratorSettings =
+        DefaultGeneratorSettings(
+          fileName,
+          basePackageName,
+          codeProvidedPackage,
+          securityProvider = customSecurityProvider,
+          injectionProvider = new injection.ScaldiInjectionProvider()
+        )
     }
   )
   .enablePlugins(PlayScala)
