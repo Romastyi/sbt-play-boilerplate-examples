@@ -10,3 +10,5 @@ src/main/scala-2.11
 .history
 logs
 server/src/main/resources/routes
+*.class
+*.log
