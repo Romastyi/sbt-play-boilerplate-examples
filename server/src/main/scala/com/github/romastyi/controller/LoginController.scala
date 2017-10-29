@@ -1,10 +1,10 @@
-package eu.unicredit.controller
+package com.github.romastyi.controller
 
 /**
   * Created by romastyi on 06.05.17.
   */
 
-import eu.unicredit.{UserAuthConfig, UserModel}
+import com.github.romastyi.{UserAuthConfig, UserModel}
 import jp.t2v.lab.play2.auth.LoginLogout
 import play.api.data.Form
 import play.api.data.Forms._

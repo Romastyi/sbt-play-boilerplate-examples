@@ -1,4 +1,4 @@
-@import eu.unicredit.UserModel
+@import com.github.romastyi.UserModel
 @(form: Form[Option[UserModel]])(implicit flash: Flash)
 <!DOCTYPE html>
 
@@ -8,7 +8,7 @@
     </head>
     <body>
 
-    @helper.form(eu.unicredit.controller.routes.LoginController.authenticate) {
+    @helper.form(com.github.romastyi.controller.routes.LoginController.authenticate()) {
 
         <h1>Sign in</h1>
 

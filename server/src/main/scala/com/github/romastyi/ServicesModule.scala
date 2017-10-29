@@ -1,4 +1,4 @@
-package eu.unicredit
+package com.github.romastyi
 
 /**
   * Created by romastyi on 07.05.17.

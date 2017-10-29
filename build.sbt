@@ -3,7 +3,7 @@ import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
 
 lazy val common = Seq(
-  organization := "eu.unicredit",
+  organization := "com.github.romastyi",
   scalaVersion := "2.11.7",
   version := "0.0.1-SNAPSHOT",
   scalacOptions ++= Seq(
@@ -37,7 +37,7 @@ lazy val server = project.
   settings(
     name := "codegen-server",
     routesImport += "test.api.controller.PetStoreController._",
-    generatorProvidedPackage := "eu.unicredit",
+    generatorProvidedPackage := "com.github.romastyi",
     generateServer := true,
     generateRoutes := true,
     generatorSettings := new GenSettings {

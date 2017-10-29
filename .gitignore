@@ -9,6 +9,8 @@ src/main/scala-2.11
 .idea
 .history
 logs
+client/src/main/swagger/.sbt-play-boilerplate
 server/src/main/resources/routes
+server/src/main/swagger/.sbt-play-boilerplate
 *.class
 *.log
