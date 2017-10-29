@@ -20,9 +20,9 @@ class ServicesModule(environment: Environment, configuration: Configuration)
 */
 
 /* Scaldi Module */
-import _root_.swagger.codegen.service.PetStoreService
+import test.api.service.PetStoreService
 import scaldi.Module
 
 class ServicesModule extends Module {
-  bind [PetStoreService] to new PetStoreServiceImpl
+  bind [PetStoreService] to PetStoreServiceImpl
 }

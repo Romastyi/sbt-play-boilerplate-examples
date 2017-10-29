@@ -4,13 +4,12 @@ package eu.unicredit.controller
   * Created by romastyi on 06.05.17.
   */
 
-import eu.unicredit.UserModel
+import eu.unicredit.{UserAuthConfig, UserModel}
 import jp.t2v.lab.play2.auth.LoginLogout
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, Controller}
-import swagger.codegen.controller.UserAuthConfig
 /* Play 2.3.x */
 //import twirl.html
 

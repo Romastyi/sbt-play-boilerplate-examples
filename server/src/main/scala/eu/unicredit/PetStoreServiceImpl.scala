@@ -4,17 +4,17 @@ package eu.unicredit
   * Created by romastyi on 05.05.17.
   */
 
-import _root_.swagger.codegen.service.PetStoreService
-import _root_.swagger.codegen._
+import test.api.model._
+import test.api.service.PetStoreService
 
 import scala.collection.mutable.{Seq => MSeq}
 import scala.concurrent.Future
 
-class PetStoreServiceImpl extends PetStoreService {
+object PetStoreServiceImpl extends PetStoreService {
 
   import PetStoreService._
 
-  private var pets: MSeq[pet] = MSeq()
+  private var pets: MSeq[Pet] = MSeq()
 
   /**
     * Returns all pets from the system that the user has access to
@@ -31,10 +31,10 @@ class PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def addPet(p: newPet, user: UserModel): Future[AddPetResponse] = {
+  override def addPet(p: NewPet, user: UserModel): Future[AddPetResponse] = {
     println(user)
-    val petToAdd = pet(p.id.getOrElse(0), p.name, p.tag)
-    pets :+= petToAdd
+    val petToAdd = Pet(p.id.getOrElse(0), p.name, p.tag)
+    pets = pets :+ petToAdd
     Future.successful(AddPetOk(petToAdd))
   }
 
@@ -55,7 +55,11 @@ class PetStoreServiceImpl extends PetStoreService {
     *
     */
   override def findPetById(id: Long): Future[FindPetByIdResponse] = {
-    Future.successful(FindPetByIdOk(pets.find(_.id == id).get))
+    Future.successful(
+      pets.find(_.id == id).map(FindPetByIdOk).getOrElse(
+        FindPetByIdDefault(ErrorModel(100, s"Pet with ID $id not found!", None, java.util.UUID.randomUUID()), 400)
+      )
+    )
   }
 
   /**
