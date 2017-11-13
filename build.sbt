@@ -4,7 +4,7 @@ import PlayBoilerplatePlugin.Keys._
 
 lazy val common = Seq(
   organization := "com.github.romastyi",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.12",
   version := "0.0.1-SNAPSHOT",
   scalacOptions ++= Seq(
     "-feature",
@@ -72,7 +72,8 @@ lazy val client = project.
   .enablePlugins(PlayScala)
   .settings(
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-ws" % "2.4.11"
+      "com.typesafe.play" %% "play-ws" % "2.4.11",
+      "com.github.romastyi" %% "play-boilerplate-utils" % "0.0.1-SNAPSHOT"
     )
   )
   .disablePlugins(PlayLayoutPlugin)

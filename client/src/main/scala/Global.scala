@@ -1,6 +1,8 @@
+import _root_.test.api
+
 import play.api._
 import play.api.libs.ws.ning.NingWSClient
-import _root_.test.api
+import play.boilerplate.utils.ServiceLocator
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -12,11 +14,13 @@ object Global extends GlobalSettings {
   override def onStart(app: Application) {
 
     val ws = NingWSClient()
+    val locator = ServiceLocator.static {
+      case _ => new java.net.URI("http://localhost:9000")
+    }
 
     /* Here insert SESSION_ID after login on server. */
     val sessionId = "22670a5fecc24cf76ab1ee98803c0a89dd291c641"
-    val client =
-      new api.client.PetStoreClient(ws)("http://localhost:9000", COOKIE -> s"PLAY2AUTH_SESS_ID=$sessionId")
+    val client = new api.client.PetStoreClient(ws, locator)(COOKIE -> s"PLAY2AUTH_SESS_ID=$sessionId")
 
     val dog = api.model.NewPet(id = Some(1), name = "dog", tag = None)
     val cat = api.model.NewPet(id = Some(2), name = "cat", tag = None)
