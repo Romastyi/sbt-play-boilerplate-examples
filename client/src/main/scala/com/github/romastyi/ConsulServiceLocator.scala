@@ -8,10 +8,13 @@ import com.typesafe.config.Config
 import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-final class ConsulServiceLocator(client: ConsulClient, config: ConsulConfig, circuitBreakers: CircuitBreakersPanel)
-  extends ServiceLocator(circuitBreakers) {
+final class ConsulServiceLocator(client: ConsulClient, config: ConsulConfig)
+                                (implicit cb: CircuitBreakersPanel)
+  extends ServiceLocator(cb) {
+
+  import ExecutionContext.Implicits.global
 
   override def locate(name: String): Future[Option[URI]] = {
     Future {
@@ -31,10 +34,10 @@ final class ConsulServiceLocator(client: ConsulClient, config: ConsulConfig, cir
 
 object ConsulServiceLocator {
 
-  def instance(config: Config, circuitBreakers: CircuitBreakersPanel): ServiceLocator = {
+  def instance(config: Config)(implicit cb: CircuitBreakersPanel): ServiceLocator = {
     val consulConfig = ConsulConfig.fromConfig(config)
     val consulClient = new ConsulClient(consulConfig.agentHostname, consulConfig.agentPort)
-    new ConsulServiceLocator(consulClient, consulConfig, circuitBreakers)
+    new ConsulServiceLocator(consulClient, consulConfig)
   }
 
 }

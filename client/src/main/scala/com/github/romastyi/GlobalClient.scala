@@ -1,7 +1,10 @@
 package com.github.romastyi
 
+import akka.actor.ActorSystem
+import play.api.libs.ws.WSClient
 import play.api.libs.ws.ning.NingWSClient
 import play.api.{Application, GlobalSettings}
+import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
 import test.api
 
 import scala.concurrent.Await
@@ -13,11 +16,13 @@ object GlobalClient extends GlobalSettings {
 
   override def onStart(app: Application) {
 
-    val ws = NingWSClient()
     val config = app.configuration.underlying
-    val circuitBreakers = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))(app.actorSystem)
-    val locator = ConsulServiceLocator.instance(config, circuitBreakers)
-    /*ServiceLocator.static {
+
+    implicit val ws: WSClient = NingWSClient()
+    implicit val system: ActorSystem = app.actorSystem
+    implicit val circuitBreakers: CircuitBreakersPanel = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))
+    implicit val locator: ServiceLocator = ConsulServiceLocator.instance(config)
+    /*ServiceLocator.Static {
       case _ => new java.net.URI("http://localhost:9000")
     }*/
 

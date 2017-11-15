@@ -7,23 +7,27 @@ import play.boilerplate.utils.{CircuitBreaker, CircuitBreakerConfig, CircuitBrea
 
 import scala.concurrent.{ExecutionContext, Future}
 
-final class AkkaCircuitBreakersPanel(config: Config)(implicit system: ActorSystem) extends CircuitBreakersPanel.FromConfig(config) {
+final class AkkaCircuitBreakersPanel(config: Config)
+                                    (implicit system: ActorSystem)
+  extends CircuitBreakersPanel.DefaultImpl(config) {
 
-  override def createCircuitBreaker(breakerConfig: CircuitBreakerConfig): CircuitBreaker = {
-    new CircuitBreaker {
+  case class CircuitBreakerImpl(breakerConfig: CircuitBreakerConfig)(implicit ec: ExecutionContext) extends CircuitBreaker {
 
-      lazy val breaker = new AkkaCircuitBreaker(
-        system.scheduler,
-        breakerConfig.maxFailures,
-        breakerConfig.callTimeout,
-        breakerConfig.resetTimeout
-      )(ExecutionContext.global)
+    lazy val breaker = new AkkaCircuitBreaker(
+      system.scheduler,
+      breakerConfig.maxFailures,
+      breakerConfig.callTimeout,
+      breakerConfig.resetTimeout
+    )
 
-      override def withCircuitBreaker[T](block: => Future[T]): Future[T] = {
-        breaker.withCircuitBreaker(block)
-      }
-
+    override def withCircuitBreaker[T](block: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+      breaker.withCircuitBreaker(block)
     }
+
+  }
+
+  override def createCircuitBreaker(breakerConfig: CircuitBreakerConfig)(implicit ec: ExecutionContext): CircuitBreaker = {
+    CircuitBreakerImpl(breakerConfig)
   }
 
 }

@@ -73,7 +73,8 @@ lazy val client = project.
   .settings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % "2.4.11",
-      "com.github.romastyi" %% "play-boilerplate-utils" % "0.0.1-SNAPSHOT"
+      "com.github.romastyi" %% "play-boilerplate-utils" % "0.0.1-SNAPSHOT",
+      "com.ecwid.consul" % "consul-api" % "1.2.4"
     )
   )
   .disablePlugins(PlayLayoutPlugin)
