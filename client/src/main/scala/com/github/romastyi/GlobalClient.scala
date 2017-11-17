@@ -1,13 +1,16 @@
 package com.github.romastyi
 
 import akka.actor.ActorSystem
-import play.api.libs.ws.WSClient
-import play.api.libs.ws.ning.NingWSClient
 import play.api.{Application, GlobalSettings}
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.json.Json
+import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.ning.NingWSClient
 import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
 import test.api
+import test.api.client.RequestHandler
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 object GlobalClient extends GlobalSettings {
@@ -22,13 +25,27 @@ object GlobalClient extends GlobalSettings {
     implicit val system: ActorSystem = app.actorSystem
     implicit val circuitBreakers: CircuitBreakersPanel = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))
     implicit val locator: ServiceLocator = ConsulServiceLocator.instance(config)
-    /*ServiceLocator.Static {
-      case _ => new java.net.URI("http://localhost:9000")
-    }*/
-
+      /*ServiceLocator.Static {
+        case _ => new java.net.URI("http://localhost:9000")
+      }*/
     /* Here insert SESSION_ID after login on server. */
-    val sessionId = "22670a5fecc24cf76ab1ee98803c0a89dd291c641" // user1
-    val client = new api.client.PetStoreClient(ws, locator)(COOKIE -> s"PLAY2AUTH_SESS_ID=$sessionId")
+//    val sessionId = "22670a5fecc24cf76ab1ee98803c0a89dd291c641" // user1
+    implicit val handler: RequestHandler = new RequestHandler {
+      override def handleRequest(operationId: String, request: WSRequest): Future[WSRequest] = {
+        locator.doServiceCall("petStore", "login") { uri =>
+          for {
+            response <- ws.url(s"$uri/login").post(Json.obj("email" -> "user1", "password" -> "pass"))
+          } yield response.cookie("PLAY2AUTH_SESS_ID").flatMap(_.value) match {
+            case Some(sessionId) => request.withHeaders(COOKIE -> s"PLAY2AUTH_SESS_ID=$sessionId")
+            case None => request
+          }
+        }
+      }
+      override def onSuccess(operationId: String, response: AnyRef): Unit = ()
+      override def onError(operationId: String, cause: Throwable): Unit = ()
+    }
+
+    val client = new api.client.PetStoreClient(ws, locator, handler)
 
     val dog = api.model.NewPet(id = Some(1), name = "dog", tag = None)
     val cat = api.model.NewPet(id = Some(2), name = "cat", tag = None)

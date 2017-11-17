@@ -8,8 +8,9 @@ import com.github.romastyi.{UserAuthConfig, UserModel}
 import jp.t2v.lab.play2.auth.LoginLogout
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.http.MimeTypes
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 /* Play 2.3.x */
 //import twirl.html
 
@@ -24,8 +25,23 @@ object LoginController extends Controller with LoginLogout with UserAuthConfig {
   }
 
   /** Alter the login page action to suit your application. */
-  def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+  def login: Action[AnyContent] = Action.async { implicit request =>
+    val accept = request.headers.get(ACCEPT).getOrElse("")
+    if (accept.contains(MimeTypes.HTML)) {
+      Future.successful(Ok(html.login(loginForm)))
+    } else {
+      request.body.asJson match {
+        case Some(json) =>
+          val username = (json \ "email").as[String]
+          val password = (json \ "password").as[String]
+          UserModel.authenticate(username, password) match {
+            case Some(user) => gotoLoginSucceeded(user.id)
+            case None => Future.successful(Unauthorized)
+          }
+        case None =>
+          Future.successful(BadRequest)
+      }
+    }
   }
 
   /**
@@ -38,7 +54,7 @@ object LoginController extends Controller with LoginLogout with UserAuthConfig {
     *     "success" -> "You've been logged out"
     *   ))
     */
-  def logout = Action.async { implicit request =>
+  def logout: Action[AnyContent] = Action.async { implicit request =>
     // do something...
     gotoLogoutSucceeded
   }
@@ -49,7 +65,7 @@ object LoginController extends Controller with LoginLogout with UserAuthConfig {
     * Since the `gotoLoginSucceeded` returns `Future[Result]`,
     * you can add a procedure like the `gotoLogoutSucceeded`.
     */
-  def authenticate = Action.async { implicit request =>
+  def authenticate: Action[AnyContent] = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(html.login(formWithErrors))),
       user => gotoLoginSucceeded(user.get.id)
