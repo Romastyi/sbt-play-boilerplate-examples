@@ -7,8 +7,8 @@ import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSRequest}
 import play.api.libs.ws.ning.NingWSClient
 import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
-import test.api
-import test.api.client.RequestHandler
+import test.api.client.PetStoreClient
+import test.api.model.NewPet
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -30,7 +30,7 @@ object GlobalClient extends GlobalSettings {
       }*/
     /* Here insert SESSION_ID after login on server. */
 //    val sessionId = "22670a5fecc24cf76ab1ee98803c0a89dd291c641" // user1
-    implicit val handler: RequestHandler = new RequestHandler {
+    implicit val handler: PetStoreClient.RequestHandler = new PetStoreClient.RequestHandler {
       override def handleRequest(operationId: String, request: WSRequest): Future[WSRequest] = {
         locator.doServiceCall("petStore", "login") { uri =>
           for {
@@ -45,10 +45,10 @@ object GlobalClient extends GlobalSettings {
       override def onError(operationId: String, cause: Throwable): Unit = ()
     }
 
-    val client = new api.client.PetStoreClient(ws, locator, handler)
+    val client = new PetStoreClient
 
-    val dog = api.model.NewPet(id = Some(1), name = "dog", tag = None)
-    val cat = api.model.NewPet(id = Some(2), name = "cat", tag = None)
+    val dog = NewPet(id = Some(1), name = "dog", tag = None)
+    val cat = NewPet(id = Some(2), name = "cat", tag = None)
 
     println("pets now are " + Await.result(client.findPets(None, Some(100)), 30 seconds))
 
