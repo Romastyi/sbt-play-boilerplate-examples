@@ -1,18 +1,7 @@
 import play.boilerplate.generators._
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
-
-lazy val common = Seq(
-  organization := "com.github.romastyi",
-  scalaVersion := "2.11.12",
-  version := "0.0.1-SNAPSHOT",
-  scalacOptions ++= Seq(
-    "-feature",
-    "-language:postfixOps"),
-  libraryDependencies ++= Seq(
-    "com.typesafe.play" %% "play-json" % "2.4.11"
-  )
-)
+import CommonSettings._
 
 lazy val customSecurityProvider = new security.Play2AuthSecurityProvider("UserModel", "UserAuthConfig", "session") {
 
@@ -80,4 +69,9 @@ lazy val client = project.
   .disablePlugins(PlayLayoutPlugin)
   .enablePlugins(PlayBoilerplatePlugin)
 
-lazy val root = project.in(file(".")).aggregate(server, client)
+lazy val `auth-api` = ApiProject("auth-api", file("auth-api"))
+  .settings(libraryDependencies += "jp.t2v" %% "play2-auth" % "0.14.2")
+lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"))
+  .dependsOn(`auth-api`)
+
+lazy val root = project.in(file(".")).aggregate(server, client, `auth-api`, `auth-impl`)

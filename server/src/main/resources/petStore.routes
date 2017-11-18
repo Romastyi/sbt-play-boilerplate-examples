@@ -1,0 +1,5 @@
+GET                 /api/pets                                                   @test.api.controller.PetStoreController.findPets(tags: Option[List[test.api.service.PetStoreService.FindPetsTags.Value]], limit: Option[Int])
+POST                /api/pets                                                   @test.api.controller.PetStoreController.addPet()
+GET                 /api/pets/$id<[0-9]+>                                       @test.api.controller.PetStoreController.findPetById(id: Long)
+DELETE              /api/pets/$id<[0-9]+>                                       @test.api.controller.PetStoreController.deletePet(id: Long)
+GET                 /api/pets/:tag                                              @test.api.controller.PetStoreController.findPetByTag(tag: test.api.service.PetStoreService.FindPetByTagTag.Value)
