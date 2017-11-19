@@ -76,10 +76,12 @@ lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"), `auth-api`)
 
 lazy val `petStore-api` = ApiProject("petStore-api", file("petStore-api"))
   .dependsOn(`auth-api`)
+lazy val `petStore-impl` = ImplProject("petStore-impl", file("petStore-impl"), `petStore-api`)
+  .settings(routesImport += "com.github.romastyi.api.controller.PetStoreController._")
 
 lazy val root = project.in(file("."))
   .aggregate(
     server, client,
     `auth-api`, `auth-impl`,
-    `petStore-api`
+    `petStore-api`, `petStore-impl`
   )
