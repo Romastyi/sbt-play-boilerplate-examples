@@ -1,0 +1,3 @@
+GET         /             @com.github.romastyi.controller.LoginController.login
+POST        /login        @com.github.romastyi.controller.LoginController.authenticate
+->          /             auth.Routes
