@@ -74,4 +74,12 @@ lazy val `auth-api` = ApiProject("auth-api", file("auth-api"))
 lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"), `auth-api`)
   .settings(generateServer := false)
 
-lazy val root = project.in(file(".")).aggregate(server, client, `auth-api`, `auth-impl`)
+lazy val `petStore-api` = ApiProject("petStore-api", file("petStore-api"))
+  .dependsOn(`auth-api`)
+
+lazy val root = project.in(file("."))
+  .aggregate(
+    server, client,
+    `auth-api`, `auth-impl`,
+    `petStore-api`
+  )

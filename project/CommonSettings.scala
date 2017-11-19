@@ -26,7 +26,12 @@ object CommonSettings {
     )
   )
 
-  object SecurityProvider extends security.Play2AuthSecurityProvider("UserModel", "UserAuthConfig", "session") {
+  object AuthSecurityProvider extends security.Play2AuthSecurityProvider(
+    "UserModel",
+    "UserAuthConfig",
+    "session",
+    Seq("com.github.romastyi.api.domain")
+  ) {
 
     import treehugger.forest._
     import definitions._
@@ -49,7 +54,7 @@ object CommonSettings {
         fileName,
         basePackageName,
         codeProvidedPackage,
-        securityProvider = SecurityProvider
+        securityProvider = AuthSecurityProvider
       )
   }
 
@@ -77,7 +82,7 @@ object CommonSettings {
         fileName,
         basePackageName,
         codeProvidedPackage,
-        securityProvider = SecurityProvider,
+        securityProvider = AuthSecurityProvider,
         injectionProvider = new injection.ScaldiInjectionProvider()
       )
   }
