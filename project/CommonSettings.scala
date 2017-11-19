@@ -48,7 +48,8 @@ object CommonSettings {
       DefaultGeneratorSettings(
         fileName,
         basePackageName,
-        codeProvidedPackage
+        codeProvidedPackage,
+        securityProvider = SecurityProvider
       )
   }
 
@@ -59,9 +60,14 @@ object CommonSettings {
       generateModel := true,
       generateJson := true,
       generateService := true,
+      generateClient := true,
       generatorSettings := ApiGenSettings,
       unmanagedResourceDirectories in Compile += generatorSourceDir.value,
-      exportJars := true
+      exportJars := true,
+      libraryDependencies ++= Seq(
+        "com.typesafe.play" %% "play-ws" % PlayVersion,
+        "com.github.romastyi" %% "play-boilerplate-utils" % "0.0.1-SNAPSHOT"
+      )
     )
     .enablePlugins(PlayBoilerplatePlugin)
 
@@ -76,7 +82,7 @@ object CommonSettings {
       )
   }
 
-  def ImplProject(name: String, dir: File): Project = Project(name, dir)
+  def ImplProject(name: String, dir: File, api: Project): Project = Project(name, dir)
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
@@ -86,10 +92,15 @@ object CommonSettings {
       generateService := false,
       generateRoutes := true,
       generatorSettings := ImplGenSettings,
-      generatorsSources += ClasspathJarsWatcher((dependencyClasspath in Compile).value, (sourceManaged in Compile).value)
+      generatorsSources += {
+        val dependencies = (exportedProducts in Compile in api).value
+        val toDirectory = (sourceManaged in Compile).value
+        ClasspathJarsWatcher(dependencies, toDirectory)
+      }
     )
     .enablePlugins(PlayBoilerplatePlugin)
     .enablePlugins(PlayScala)
     .disablePlugins(PlayLayoutPlugin)
+    .dependsOn(api)
 
 }

@@ -71,7 +71,7 @@ lazy val client = project.
 
 lazy val `auth-api` = ApiProject("auth-api", file("auth-api"))
   .settings(libraryDependencies += "jp.t2v" %% "play2-auth" % "0.14.2")
-lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"))
-  .dependsOn(`auth-api`)
+lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"), `auth-api`)
+  .settings(generateServer := false)
 
 lazy val root = project.in(file(".")).aggregate(server, client, `auth-api`, `auth-impl`)

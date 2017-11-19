@@ -23,9 +23,16 @@ paths:
             $ref: '#/definitions/LoginUser'
       responses:
         200:
-          description: User logged in
+          description: User is logged in
         403:
           description: Wrong user
+  /logout:
+    get:
+      description: Logout action
+      operationId: logout
+      responses:
+        200:
+          description: User is logged out
 definitions:
   LoginUser:
     type: object
