@@ -1,12 +1,13 @@
 package com.github.romastyi
 
 import akka.actor.ActorSystem
+import com.github.romastyi.api.client.dsl.{AkkaCircuitBreakersPanel, ConsulServiceLocator}
 import play.api.{Application, GlobalSettings}
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSRequest}
 import play.api.libs.ws.ning.NingWSClient
-import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
+import play.boilerplate.api.client.dsl.{CircuitBreakersPanel, ServiceLocator}
 import test.api.client.PetStoreClient
 import test.api.model.NewPet
 

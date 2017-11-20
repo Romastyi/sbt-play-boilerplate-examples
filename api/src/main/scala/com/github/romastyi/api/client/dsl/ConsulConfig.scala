@@ -1,4 +1,4 @@
-package com.github.romastyi
+package com.github.romastyi.api.client.dsl
 
 import com.typesafe.config.Config
 

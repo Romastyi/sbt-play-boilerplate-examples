@@ -75,7 +75,7 @@ object CommonSettings {
       exportJars := true,
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play-ws" % PlayVersion,
-        "com.github.romastyi" %% "play-boilerplate-utils" % "0.0.1-SNAPSHOT"
+        "com.github.romastyi" %% "play-boilerplate-api" % "0.0.1-SNAPSHOT"
       )
     )
     .enablePlugins(PlayBoilerplatePlugin)

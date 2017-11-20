@@ -1,9 +1,9 @@
-package com.github.romastyi
+package com.github.romastyi.api.client.dsl
 
 import akka.actor.ActorSystem
 import akka.pattern.{CircuitBreaker => AkkaCircuitBreaker}
 import com.typesafe.config.Config
-import play.boilerplate.utils.{CircuitBreaker, CircuitBreakerConfig, CircuitBreakersPanel}
+import play.boilerplate.api.client.dsl.{CircuitBreaker, CircuitBreakerConfig, CircuitBreakersPanel}
 
 import scala.concurrent.{ExecutionContext, Future}
 

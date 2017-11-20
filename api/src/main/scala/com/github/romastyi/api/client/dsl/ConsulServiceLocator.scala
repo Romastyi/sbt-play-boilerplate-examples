@@ -1,11 +1,11 @@
-package com.github.romastyi
+package com.github.romastyi.api.client.dsl
 
 import java.net.{InetAddress, URI}
 
 import com.ecwid.consul.v1.catalog.model.CatalogService
 import com.ecwid.consul.v1.{ConsulClient, QueryParams}
 import com.typesafe.config.Config
-import play.boilerplate.utils.{CircuitBreakersPanel, ServiceLocator}
+import play.boilerplate.api.client.dsl.{CircuitBreakersPanel, ServiceLocator}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
