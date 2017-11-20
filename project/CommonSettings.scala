@@ -30,7 +30,11 @@ object CommonSettings {
     "UserModel",
     "UserAuthConfig",
     "session",
-    Seq("com.github.romastyi.api.domain")
+    Seq(
+      "com.github.romastyi.api.domain.UserModel",
+      "com.github.romastyi.api.domain.UserRole",
+      "com.github.romastyi.api.domain.UserAuthority"
+    )
   ) {
 
     import treehugger.forest._
