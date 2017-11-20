@@ -8,8 +8,8 @@ import sbt.Keys._
 object CommonSettings {
 
   val Version = "0.0.1-SNAPSHOT"
-  val PlayVersion = "2.4.11"
-  val ScaldiVersion = "0.5.12"
+  val PlayVersion = "2.5.18"
+  val ScaldiVersion = "0.5.15"
 
   val common = Seq(
     organization := "com.github.romastyi",
@@ -100,12 +100,14 @@ object CommonSettings {
       generateServer := true,
       generateService := false,
       generateRoutes := true,
+      generateRoutesCodeGenerator := InjectedRoutesCodeGenerator,
       generatorSettings := ImplGenSettings,
       generatorsSources += {
         val dependencies = (exportedProducts in Compile in api).value
         val toDirectory = (sourceManaged in Compile).value
         ClasspathJarsWatcher(dependencies, toDirectory)
-      }
+      },
+      javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )
     .enablePlugins(PlayBoilerplatePlugin)
     .enablePlugins(PlayScala)
