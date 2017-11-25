@@ -14,6 +14,7 @@ object PetStoreServiceImpl extends PetStoreService {
 
   import PetStoreService._
 
+  private val ids = new java.util.concurrent.atomic.AtomicLong(0l)
   private var pets: MSeq[Pet] = MSeq()
 
   /**
@@ -32,8 +33,7 @@ object PetStoreServiceImpl extends PetStoreService {
     *
     */
   override def addPet(p: NewPet, user: UserModel): Future[AddPetResponse] = {
-    logger.debug(user.toString)
-    val petToAdd = Pet(p.id.getOrElse(0), p.name, p.tag)
+    val petToAdd = Pet(ids.incrementAndGet(), p.name, p.tag)
     pets = pets :+ petToAdd
     Future.successful(AddPetOk(petToAdd))
   }
@@ -43,7 +43,7 @@ object PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def deletePet(id: Long): Future[DeletePetResponse] = {
+  override def deletePet(id: Long, user: UserModel): Future[DeletePetResponse] = {
     pets.find(_.id == id).get
     pets = pets.filter(_.id != id)
     Future.successful(DeletePetNoContent)
@@ -54,7 +54,7 @@ object PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def findPetById(id: Long): Future[FindPetByIdResponse] = {
+  override def findPetById(id: Long, user: UserModel): Future[FindPetByIdResponse] = {
     Future.successful(
       pets.find(_.id == id).map(FindPetByIdOk).getOrElse(
         FindPetByIdDefault(ErrorModel(100, s"Pet with ID $id not found!", None, java.util.UUID.randomUUID()), 400)
@@ -67,7 +67,7 @@ object PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def findPetByTag(tag: PetStoreService.FindPetByTagTag.Value): Future[FindPetByTagResponse] = {
+  override def findPetByTag(tag: PetStoreService.FindPetByTagTag.Value, user: UserModel): Future[FindPetByTagResponse] = {
     Future.successful(FindPetByTagOk(pets.find(_.tag.getOrElse(Nil).contains(tag)).get))
   }
 

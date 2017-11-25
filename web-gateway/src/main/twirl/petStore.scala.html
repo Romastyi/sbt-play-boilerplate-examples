@@ -1,5 +1,6 @@
-@import com.github.romastyi.api.model.Pet
-@(list: List[Pet])
+@import com.github.romastyi.api.model.{Pet, NewPet}
+@import helper._
+@(pets: List[Pet], petForm: Form[NewPet])(implicit flash: Flash)
 <!DOCTYPE html>
 
 <html>
@@ -10,16 +11,28 @@
     <body>
         <div id="myDIV" class="header">
             <h2>My pet store</h2>
-            <input type="text" id="myInput" placeholder="Title...">
-            <span onclick="newElement()" class="addBtn">Add</span>
+            @form(com.github.romastyi.controller.routes.PetStoreController.addPet) {
+                <input type="text" id="petName" name="petName" placeholder="Name...">
+                <input type="submit" value="Add" class="addBtn">
+            }
         </div>
 
+        @errors(items: Seq[String]) = {
+            @items.filter(_.nonEmpty).map { message =>
+                <p class="error">@message</p>
+            }
+        }
+
+        @errors(flash.get("error").toList ++ petForm.globalError.map(_.message).toList)
+
         <ul id="myUL">
-            @for(pet <- list) {
-                <li>pet.name<span class="close">×</span></li>
+            @pets.map { pet =>
+                <li>@pet.name
+                    @form(com.github.romastyi.controller.routes.PetStoreController.delete(pet.id)) {
+                        <input type="submit" value="×" class="close">
+                    }
+                </li>
             }
         </ul>
-
-        <script src="@routes.Assets.at("javascripts/petStore.js")" type="text/javascript"></script>
     </body>
 </html>

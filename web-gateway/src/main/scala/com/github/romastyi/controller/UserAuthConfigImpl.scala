@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, Future}
 trait UserAuthConfigImpl extends UserAuthConfig { this: Controller =>
 
   override def loginSucceeded(request: RequestHeader)(implicit context: ExecutionContext): Future[Result] = {
-    Future.successful(Redirect(routes.IndexController.index()))
+    Future.successful(Redirect(routes.PetStoreController.index()))
   }
 
   override def logoutSucceeded(request: RequestHeader)(implicit context: ExecutionContext): Future[Result] = {
