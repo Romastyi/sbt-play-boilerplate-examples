@@ -1,3 +1,8 @@
-GET         /             com.github.romastyi.controller.LoginController.login
-POST        /login        com.github.romastyi.controller.LoginController.authenticate
-->          /             auth.Routes
+GET         /                    com.github.romastyi.controller.LoginController.login
+POST        /login               com.github.romastyi.controller.LoginController.authenticate
+GET         /logout              com.github.romastyi.controller.LoginController.logout
+GET         /index               @com.github.romastyi.controller.IndexController.index
+
+GET         /assets/*file        controllers.Assets.at(path="/public", file)
+
+->          /                    auth.Routes

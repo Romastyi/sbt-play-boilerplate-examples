@@ -25,9 +25,11 @@ lazy val `api` = project.in(file("api"))
   .settings(common: _ *)
   .settings(
     libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-ws" % PlayVersion,
       "com.github.romastyi" %% "play-boilerplate-api" % "0.0.1-SNAPSHOT",
       "com.ecwid.consul" % "consul-api" % "1.2.4",
-      "jp.t2v" %% "play2-auth" % "0.14.2"
+      "jp.t2v" %% "play2-auth" % "0.14.2",
+      "com.pauldijou" %% "jwt-play" % "0.9.2"
     )
   )
 
@@ -45,6 +47,9 @@ lazy val `web-gateway` = project.in(file("web-gateway"))
   .settings(common: _ *)
   .enablePlugins(PlayScala)
   .disablePlugins(PlayLayoutPlugin)
+  .settings(
+    sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
+  )
   .dependsOn(`api`, `auth-impl`, `petStore-api`)
 
 lazy val root = project.in(file("."))

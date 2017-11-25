@@ -7,9 +7,9 @@ final case class ConsulConfig(agentHostname: String, agentPort: Int, scheme: Str
 object ConsulConfig {
 
   def fromConfig(config: Config): ConsulConfig = ConsulConfig(
-    agentHostname = config.getString("discovery.consul.agent-hostname"),
-    agentPort = config.getInt("discovery.consul.agent-port"),
-    scheme = config.getString("discovery.consul.uri-scheme")
+    agentHostname = config.getString("consul.agent-hostname"),
+    agentPort = config.getInt("consul.agent-port"),
+    scheme = config.getString("consul.uri-scheme")
   )
 
 }

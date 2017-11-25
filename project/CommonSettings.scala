@@ -1,6 +1,8 @@
 import play.boilerplate.generators._
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
+import play.boilerplate.generators.injection.InjectionProvider
+import play.boilerplate.generators.security.SecurityProvider._
 import play.sbt.{PlayLayoutPlugin, PlayScala}
 import sbt._
 import sbt.Keys._
@@ -26,6 +28,23 @@ object CommonSettings {
     )
   )
 
+  object Auth {
+
+    import treehugger.forest._
+    import definitions._
+    import treehuggerDSL._
+
+    def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] = {
+      val roles = scopes.find(_.scope == "roles").map { s =>
+        ImmutableSetClass APPLY s.values.map(r => REF(s"UserRole.$r"))
+      }.getOrElse {
+        REF("UserRole.all")
+      }
+      Seq(REF("UserAuthority") APPLY roles)
+    }
+
+  }
+
   object AuthSecurityProvider extends security.Play2AuthSecurityProvider(
     "UserModel",
     "UserAuthConfig",
@@ -38,16 +57,47 @@ object CommonSettings {
   ) {
 
     import treehugger.forest._
-    import definitions._
+
+    override def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] =
+      Auth.parseAuthority(scopes)
+
+  }
+
+  object JwtSecurityProvider extends DefaultSecurity("jwt") {
+
+    import treehugger.forest._
     import treehuggerDSL._
 
-    override def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] = {
-      val roles = scopes.find(_.scope == "roles").map { s =>
-        ImmutableSetClass APPLY s.values.map(r => REF(s"UserRole.$r"))
-      }.getOrElse {
-        REF("UserRole.all")
+    override def controllerImports: Seq[Import] = {
+      Seq(
+        IMPORT("com.github.romastyi.api.controller", "UserJwtController"),
+        IMPORT("com.github.romastyi.api.domain", "_")
+      )
+    }
+
+    override def controllerParents: Seq[Type] = Seq(TYPE_REF("UserJwtController"))
+    override def controllerSelfTypes: Seq[Type] = Nil
+    override def controllerDependencies: Seq[InjectionProvider.Dependency] = Nil
+    override def serviceImports: Seq[Import] = Seq(IMPORT("com.github.romastyi.api.domain", "_"))
+
+    override def composeActionSecurity(scopes: Seq[SecurityScope]): ActionSecurity = {
+
+      val authority = Auth.parseAuthority(scopes)
+      val userType: Type = TYPE_REF("UserModel")
+      val userValue: ValDef = VAL("user", userType) := REF("request") DOT "user"
+
+      new ActionSecurity {
+        override def actionMethod(parser: Tree): Tree = {
+          REF("Authenticated") APPLY authority DOT "async" APPLY parser
+        }
+        override val securityParams: Map[String, Type] = {
+          Map("user" -> userType)
+        }
+        override val securityValues: Map[String, ValDef] = {
+          Map("user" -> userValue)
+        }
       }
-      Seq(REF("UserAuthority") APPLY roles)
+
     }
 
   }
@@ -58,7 +108,7 @@ object CommonSettings {
         fileName,
         basePackageName,
         codeProvidedPackage,
-        securityProvider = AuthSecurityProvider
+        securityProvider = JwtSecurityProvider
       )
   }
 
@@ -86,7 +136,7 @@ object CommonSettings {
         fileName,
         basePackageName,
         codeProvidedPackage,
-        securityProvider = AuthSecurityProvider,
+        securityProvider = JwtSecurityProvider,
         injectionProvider = new injection.ScaldiInjectionProvider()
       )
   }

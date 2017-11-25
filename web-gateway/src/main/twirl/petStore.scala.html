@@ -1,0 +1,25 @@
+@import com.github.romastyi.api.model.Pet
+@(list: List[Pet])
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Pet store</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/petStore.css")">
+    </head>
+    <body>
+        <div id="myDIV" class="header">
+            <h2>My pet store</h2>
+            <input type="text" id="myInput" placeholder="Title...">
+            <span onclick="newElement()" class="addBtn">Add</span>
+        </div>
+
+        <ul id="myUL">
+            @for(pet <- list) {
+                <li>pet.name<span class="close">×</span></li>
+            }
+        </ul>
+
+        <script src="@routes.Assets.at("javascripts/petStore.js")" type="text/javascript"></script>
+    </body>
+</html>

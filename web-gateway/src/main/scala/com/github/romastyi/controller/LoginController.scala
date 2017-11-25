@@ -1,16 +1,15 @@
 package com.github.romastyi.controller
 
-import com.github.romastyi.api.controller.UserAuthConfig
 import com.github.romastyi.api.domain.UserModel
 import jp.t2v.lab.play2.auth.LoginLogout
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc._
 
 import scala.concurrent.Future
 
-class LoginController extends Controller with LoginLogout with UserAuthConfig {
+class LoginController extends Controller with LoginLogout with UserAuthConfigImpl {
 
   /** Your application's login form.  Alter it to fit your application */
   val loginForm = Form {
@@ -34,6 +33,10 @@ class LoginController extends Controller with LoginLogout with UserAuthConfig {
       formWithErrors => Future.successful(BadRequest(html.login(formWithErrors))),
       user => gotoLoginSucceeded(user.get.id)
     )
+  }
+
+  def logout: Action[AnyContent] = Action.async { implicit request =>
+    gotoLogoutSucceeded
   }
 
 }

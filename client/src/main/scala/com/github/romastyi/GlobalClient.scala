@@ -1,12 +1,13 @@
 package com.github.romastyi
 
 import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.github.romastyi.api.client.dsl.{AkkaCircuitBreakersPanel, ConsulServiceLocator}
 import play.api.{Application, GlobalSettings}
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json.Json
+import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.{WSClient, WSRequest}
-import play.api.libs.ws.ning.NingWSClient
 import play.boilerplate.api.client.dsl.{CircuitBreakersPanel, ServiceLocator}
 import test.api.client.PetStoreClient
 import test.api.model.NewPet
@@ -22,8 +23,10 @@ object GlobalClient extends GlobalSettings {
 
     val config = app.configuration.underlying
 
-    implicit val ws: WSClient = NingWSClient()
     implicit val system: ActorSystem = app.actorSystem
+    implicit val matrializer: ActorMaterializer = ActorMaterializer()
+
+    implicit val ws: WSClient = AhcWSClient()
     implicit val circuitBreakers: CircuitBreakersPanel = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))
     implicit val locator: ServiceLocator = ConsulServiceLocator.instance(config)
       /*ServiceLocator.Static {
