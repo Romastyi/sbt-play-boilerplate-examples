@@ -2,25 +2,6 @@ import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
 import CommonSettings._
 
-lazy val client = project.
-  in(file("client")).
-  settings(common: _*).
-  settings(
-    name := "codegen-client",
-    generateClient := true
-  )
-  .enablePlugins(PlayScala)
-  .settings(
-    libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-ws" % "2.4.11",
-      "com.github.romastyi" %% "play-boilerplate-api" % "0.0.1-SNAPSHOT",
-      "com.ecwid.consul" % "consul-api" % "1.2.4"
-    )
-  )
-  .disablePlugins(PlayLayoutPlugin)
-  .enablePlugins(PlayBoilerplatePlugin)
-  .dependsOn(`api`)
-
 lazy val `api` = project.in(file("api"))
   .settings(common: _ *)
   .settings(
@@ -54,7 +35,6 @@ lazy val `web-gateway` = project.in(file("web-gateway"))
 
 lazy val root = project.in(file("."))
   .aggregate(
-    client,
     `api`,
     `auth-api`, `auth-impl`,
     `petStore-api`, `petStore-impl`,
