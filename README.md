@@ -11,7 +11,7 @@ This project is simulated system with 2 micro-services and a web gateway:
 * **petStore service**: manages items of a pet store. 
 * **web-gateway**: application providing web UI and acting as gateway to services.
 
-##How to run
+## How to run
 
 Open two terminals into the root directory of this project.
 
@@ -32,7 +32,7 @@ sbt "web-gateway/run 9000"
 
 After that you should try to open **[web UI](http://localhost:9000)** from the browser.
 
-###Authorization
+### Authorization
  
 **Login**: _XXX@example.com_ (where _XXX_ - one of roles' name: _admin_, _user_, _api_. For example: _admin@example.com_)
 **Password**: _pass_
