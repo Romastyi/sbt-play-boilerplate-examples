@@ -25,7 +25,8 @@ object CommonSettings {
       "com.typesafe.play" %% "play" % PlayVersion,
       "com.typesafe.play" %% "play-json" % PlayVersion,
       "org.scaldi" %% "scaldi-play" % ScaldiVersion
-    )
+    ),
+    resolvers += Opts.resolver.sonatypeSnapshots
   )
 
   object Auth {
@@ -125,7 +126,7 @@ object CommonSettings {
       exportJars := true,
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play-ws" % PlayVersion,
-        "com.github.romastyi" %% "play-boilerplate-api" % "0.0.1-SNAPSHOT"
+        "com.github.romastyi" %% "play-boilerplate-api" % "0.0.2-SNAPSHOT"
       )
     )
     .enablePlugins(PlayBoilerplatePlugin)
