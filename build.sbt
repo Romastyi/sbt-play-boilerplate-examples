@@ -7,7 +7,7 @@ lazy val `api` = project.in(file("api"))
   .settings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % PlayVersion,
-      "com.github.romastyi" %% "play-boilerplate-api" % "0.0.2-SNAPSHOT",
+      "com.github.romastyi" %% "play-boilerplate-api-play25" % "0.0.2-SNAPSHOT",
       "com.ecwid.consul" % "consul-api" % "1.2.4",
       "jp.t2v" %% "play2-auth" % "0.14.2",
       "com.pauldijou" %% "jwt-play" % "0.9.2"

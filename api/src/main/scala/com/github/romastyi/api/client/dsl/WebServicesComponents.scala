@@ -5,7 +5,7 @@ import akka.stream.ActorMaterializer
 import play.api.{Application, Configuration}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
-import play.boilerplate.api.client.dsl.{CircuitBreakersPanel, ServiceLocator}
+import play.boilerplate.api.client.dsl.{AkkaCircuitBreakersPanel, CircuitBreakersPanel, ServiceLocator}
 import scaldi.Module
 
 class WebServicesComponents extends Module {
