@@ -15,16 +15,27 @@ object PetStoreServiceImpl extends PetStoreService {
   import PetStoreService._
 
   private val ids = new java.util.concurrent.atomic.AtomicLong(0l)
-  private var pets: MSeq[Pet] = MSeq()
+  private var pets: MSeq[Pet] = MSeq.empty
 
   /**
     * Returns all pets from the system that the user has access to
     *
     *
     */
-  override def findPets(tags: Option[List[FindPetsTags.Value]], limit: Option[Int], user: UserModel): Future[FindPetsResponse] = {
+  override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], user: UserModel): Future[FindPetsResponse] = {
+
+    def dropN(n: Int): Seq[Pet] => Seq[Pet] = _.drop(n)
+    def takeN(n: Int): Seq[Pet] => Seq[Pet] = _.take(n)
+
     logger.debug(user.toString)
-    Future.successful(FindPetsOk(pets.toList))
+
+    val modifiers: Seq[Pet] => Seq[Pet] = Function.chain(
+      pager.drop.filter(_ >= 0).toList.map(dropN) ++
+      pager.limit.filter(_ >= 0).toList.map(takeN)
+    )
+
+    Future.successful(FindPetsOk(modifiers(pets).toList))
+
   }
 
   /**

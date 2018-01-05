@@ -33,7 +33,7 @@ class PetStoreController(implicit val inj: Injector)
   }
 
   private def getPetList(user: UserModel): Future[Either[String, List[Pet]]] = {
-    petStore.findPets(None, None, user).map {
+    petStore.findPets(FindPetsPager(drop = Some(0), limit = None), None, user).map {
       case FindPetsOk(list) =>
         Right(list)
       case FindPetsDefault(error, status) =>
