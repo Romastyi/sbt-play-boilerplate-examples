@@ -9,13 +9,13 @@ import sbt.Keys._
 
 object CommonSettings {
 
-  val Version = "0.0.1-SNAPSHOT"
-  val PlayVersion = "2.5.18"
-  val ScaldiVersion = "0.5.15"
+  val Version = "0.0.2-SNAPSHOT"
+  val PlayVersion = "2.6.7"
+  val ScaldiVersion = "0.5.17"
 
   val common = Seq(
     organization := "com.github.romastyi",
-    scalaVersion := "2.11.12",
+    scalaVersion := "2.12.4",
     version := PlayVersion + "_" + Version,
     scalacOptions ++= Seq(
       "-feature",
@@ -126,7 +126,7 @@ object CommonSettings {
       exportJars := true,
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play-ws" % PlayVersion,
-        "com.github.romastyi" %% "play-boilerplate-api-play25" % "0.0.2-SNAPSHOT"
+        "com.github.romastyi" %% "play-boilerplate-api-play26" % "0.0.2-SNAPSHOT"
       )
     )
     .enablePlugins(PlayBoilerplatePlugin)
