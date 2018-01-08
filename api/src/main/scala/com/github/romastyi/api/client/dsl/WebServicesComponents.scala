@@ -15,6 +15,7 @@ class WebServicesComponents extends Module {
   implicit lazy val circuitBreakers: CircuitBreakersPanel = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))
   bind [WSClient] to AhcWSClient()
   bind [CircuitBreakersPanel] to circuitBreakers
+  // Service locators
   bind [ServiceLocator] identifiedBy 'config to ServiceLocator.DefaultImpl(config.getConfig("discovery"))
   bind [ServiceLocator] identifiedBy 'consul to ConsulServiceLocator.instance(config.getConfig("discovery"))
 }

@@ -1,26 +1,32 @@
 package com.github.romastyi.api.domain
 
+import com.mohiva.play.silhouette.api.Identity
 import play.api.libs.json._
 
-import scala.util.control.Exception._
 /**
   * Created by romastyi on 06.05.17.
   */
 
-case class UserModel(id: Long, email: String, password: String, role: UserRole.Value)
+case class UserModel(id: Long, email: String, password: String, role: UserRole.Value) extends Identity
 
 object UserModel {
 
+  private val repo = List(
+    UserModel(1, "admin@example.com", "pass", UserRole.admin),
+    UserModel(2, "api@example.com"  , "pass", UserRole.api),
+    UserModel(3, "user@example.com" , "pass", UserRole.user)
+  )
+
   def authenticate(email: String, pass: String): Option[UserModel] = {
-    val regex = """(\w+)\@.*""".r
-    (email, pass) match {
-      case (regex(username), "pass") =>
-        for {
-          role <- catching(classOf[NoSuchElementException]) opt UserRole.withName(username)
-        } yield UserModel(role.id.toLong, email, pass, role)
-      case _ =>
-        None
-    }
+    repo.find(
+      user => user.email == email && user.password == pass
+    )
+  }
+
+  def findByEmail(email: String): Option[UserModel] = {
+    repo.find(
+      user => user.email == email
+    )
   }
 
   implicit val jsonUserModel: Format[UserModel] = Json.format

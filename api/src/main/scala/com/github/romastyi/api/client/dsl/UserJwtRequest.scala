@@ -8,7 +8,7 @@ object UserJwtRequest {
 
   def withSession(request: WSRequest, user: Option[UserModel]): WSRequest = {
     user.map(UserJwtSession.newSession).fold(request)(
-      session => request.withHeaders(JwtSession.HEADER_NAME -> (JwtSession.TOKEN_PREFIX + session.serialize))
+      session => request.withHeaders(JwtSession.REQUEST_HEADER_NAME -> (JwtSession.TOKEN_PREFIX + session.serialize))
     )
   }
 

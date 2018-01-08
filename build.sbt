@@ -5,12 +5,19 @@ import CommonSettings._
 lazy val `api` = project.in(file("api"))
   .settings(common: _ *)
   .settings(
+    resolvers += Resolver.jcenterRepo,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % PlayVersion,
       "com.github.romastyi" %% "play-boilerplate-api-play26" % "0.0.2-SNAPSHOT",
+      // Consul service discovery
       "com.ecwid.consul" % "consul-api" % "1.2.4",
-      /*"jp.t2v" %% "play2-auth" % "0.14.2",*/
-      "com.pauldijou" %% "jwt-play" % "0.14.1"
+      // JWT
+      "com.pauldijou" %% "jwt-play" % "0.14.1",
+      // silhouette
+      "com.mohiva" %% "play-silhouette" % SilhouetteVersion,
+      "com.mohiva" %% "play-silhouette-password-bcrypt" % SilhouetteVersion,
+      "com.mohiva" %% "play-silhouette-crypto-jca" % SilhouetteVersion,
+      "com.mohiva" %% "play-silhouette-persistence" % SilhouetteVersion
     )
   )
 

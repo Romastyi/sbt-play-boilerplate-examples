@@ -3,7 +3,7 @@ import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
 import play.boilerplate.generators.injection.InjectionProvider
 import play.boilerplate.generators.security.SecurityProvider._
-import play.sbt.{PlayLayoutPlugin, PlayScala}
+import play.sbt.{PlayImport, PlayLayoutPlugin, PlayScala}
 import sbt._
 import sbt.Keys._
 
@@ -12,6 +12,7 @@ object CommonSettings {
   val Version = "0.0.2-SNAPSHOT"
   val PlayVersion = "2.6.7"
   val ScaldiVersion = "0.5.17"
+  val SilhouetteVersion = "5.0.0"
 
   val common = Seq(
     organization := "com.github.romastyi",
@@ -26,47 +27,85 @@ object CommonSettings {
       "com.typesafe.play" %% "play-json" % PlayVersion,
       "org.scaldi" %% "scaldi-play" % ScaldiVersion
     ),
+    libraryDependencies += PlayImport.guice,
     resolvers += Opts.resolver.sonatypeSnapshots
   )
 
-  object Auth {
+  abstract class SilhouetteSecurityProvider(securitySchema: String) extends DefaultSecurity(securitySchema) {
 
     import treehugger.forest._
     import definitions._
     import treehuggerDSL._
 
-    def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] = {
+    def envType: Type
+
+    override def controllerImports: Seq[Import] = Seq(
+      IMPORT("com.github.romastyi.api.silhouette", "_"),
+      IMPORT("com.github.romastyi.api.domain", "_"),
+      IMPORT("com.mohiva.play.silhouette.api", "Silhouette")
+    )
+    override def controllerParents: Seq[Type] = Nil
+    override def controllerSelfTypes: Seq[Type] = Nil
+    override def controllerDependencies: Seq[InjectionProvider.Dependency] = Seq(
+      InjectionProvider.Dependency("silhouette", TYPE_REF("Silhouette") TYPE_OF envType)
+    )
+
+    override def serviceImports: Seq[Import] = Seq(
+      IMPORT("com.github.romastyi.api.domain", "_")
+    )
+
+    override def composeActionSecurity(scopes: Seq[SecurityScope]): ActionSecurity = {
+
       val roles = scopes.find(_.scope == "roles").map { s =>
         ImmutableSetClass APPLY s.values.map(r => REF(s"UserRole.$r"))
       }.getOrElse {
         REF("UserRole.all")
       }
-      Seq(REF("UserAuthority") APPLY roles)
+      val authority = Seq(REF("WithRoles") APPLYTYPE (envType TYPE_# "A") APPLY roles)
+
+      val userType: Type = TYPE_REF("UserModel")
+      val userValue: ValDef = VAL("user", userType) := REF("request") DOT "identity"
+
+      new ActionSecurity {
+        override def actionMethod(parser: Tree): Tree = {
+          REF("silhouette") DOT "SecuredAction" APPLY authority DOT "async" APPLY parser
+        }
+        override val securityParams: Map[String, Type] = {
+          Map("user" -> userType)
+        }
+        override val securityValues: Map[String, ValDef] = {
+          Map("user" -> userValue)
+        }
+      }
+
     }
 
   }
 
-  object AuthSecurityProvider extends security.Play2AuthSecurityProvider(
-    "UserModel",
-    "UserAuthConfig",
-    "session",
-    Seq(
-      "com.github.romastyi.api.domain.UserModel",
-      "com.github.romastyi.api.domain.UserRole",
-      "com.github.romastyi.api.domain.UserAuthority"
-    )
-  ) {
+  object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {
 
     import treehugger.forest._
+    import treehuggerDSL._
 
-    override def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] =
-      Auth.parseAuthority(scopes)
+    override def envType: Type = TYPE_REF("SessionEnv")
 
   }
+
+/*
+  object JwtSecurityProvider  extends SilhouetteSecurityProvider("jwt") {
+
+    import treehugger.forest._
+    import treehuggerDSL._
+
+    override def envType: Type = TYPE_REF("JWTEnv")
+
+  }
+*/
 
   object JwtSecurityProvider extends DefaultSecurity("jwt") {
 
     import treehugger.forest._
+    import definitions._
     import treehuggerDSL._
 
     override def controllerImports: Seq[Import] = {
@@ -83,7 +122,13 @@ object CommonSettings {
 
     override def composeActionSecurity(scopes: Seq[SecurityScope]): ActionSecurity = {
 
-      val authority = Auth.parseAuthority(scopes)
+      val roles = scopes.find(_.scope == "roles").map { s =>
+        ImmutableSetClass APPLY s.values.map(r => REF(s"UserRole.$r"))
+      }.getOrElse {
+        REF("UserRole.all")
+      }
+      val authority = Seq(REF("UserAuthority") APPLY roles)
+
       val userType: Type = TYPE_REF("UserModel")
       val userValue: ValDef = VAL("user", userType) := REF("request") DOT "user"
 

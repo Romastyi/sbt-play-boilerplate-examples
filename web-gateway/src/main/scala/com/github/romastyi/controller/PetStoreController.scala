@@ -1,28 +1,25 @@
 package com.github.romastyi.controller
 
-import com.github.romastyi.api.domain.{UserAuthority, UserModel, UserRole}
+import com.github.romastyi.api.domain.{UserModel, UserRole}
 import com.github.romastyi.api.model.{NewPet, Pet}
 import com.github.romastyi.api.service.PetStoreService
-import jp.t2v.lab.play2.auth.AuthElement
+import com.github.romastyi.api.silhouette.{SessionEnv, WithRoles}
+import com.mohiva.play.silhouette.api.Silhouette
 import play.api.data._
 import play.api.data.Forms._
-import play.api.Logger
-import play.api.mvc.{Action, AnyContent, Controller}
-import play.api.libs.concurrent.Execution.Implicits._
+import play.api.mvc._
 import scaldi.{Injectable, Injector}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class PetStoreController(implicit val inj: Injector)
-  extends Controller
-    with UserAuthConfigImpl
-    with AuthElement
-    with Injectable {
+class PetStoreController(implicit val inj: Injector) extends InjectedController with Injectable {
 
   import PetStoreService._
 
-  val logger = Logger(this.getClass.getName)
-  val petStore: PetStoreService = inject[PetStoreService]
+  implicit lazy val ec: ExecutionContext = controllerComponents.executionContext
+
+  private val silhouette = inject[Silhouette[SessionEnv]]
+  private val petStore = inject[PetStoreService]
 
   val petForm = Form {
     mapping("petName" -> nonEmptyText)(
@@ -44,9 +41,9 @@ class PetStoreController(implicit val inj: Injector)
     }
   }
 
-  def index: Action[AnyContent] = AsyncStack(AuthorityKey -> UserAuthority(UserRole.all)) { implicit request =>
+  def index: Action[AnyContent] = silhouette.SecuredAction(WithRoles[SessionEnv#A](UserRole.all)).async { implicit request =>
     for {
-      result <- getPetList(loggedIn)
+      result <- getPetList(request.identity)
     } yield result.fold(
       error => Ok(html.petStore(Nil, petForm.withGlobalError(error))),
       list => Ok(html.petStore(list, petForm))
@@ -65,13 +62,13 @@ class PetStoreController(implicit val inj: Injector)
     }
   }
 
-  def addPet(): Action[AnyContent] = AsyncStack(AuthorityKey -> UserAuthority(Set(UserRole.admin))) { implicit request =>
+  def addPet(): Action[AnyContent] = silhouette.SecuredAction(WithRoles[SessionEnv#A](Set(UserRole.admin))).async { implicit request =>
     petForm.bindFromRequest().fold(
       errors => Future.successful(Redirect(routes.PetStoreController.index()).flashing(
         ("error", errors.globalError.map(_.message).getOrElse(""))
       )),
       newPet => for {
-        result <- createNewPet(newPet, loggedIn)
+        result <- createNewPet(newPet, request.identity)
       } yield result.fold(
         error => Redirect(routes.PetStoreController.index()).flashing(("error", error)),
         _ => Redirect(routes.PetStoreController.index())
@@ -91,9 +88,9 @@ class PetStoreController(implicit val inj: Injector)
     }
   }
 
-  def delete(id: Long): Action[AnyContent] = AsyncStack(AuthorityKey -> UserAuthority(Set(UserRole.admin))) { implicit request =>
+  def delete(id: Long): Action[AnyContent] = silhouette.SecuredAction(WithRoles[SessionEnv#A](Set(UserRole.admin))).async { implicit request =>
     for {
-      result <- deletePet(id, loggedIn)
+      result <- deletePet(id, request.identity)
     } yield result.fold(
       error => Redirect(routes.PetStoreController.index()).flashing(("error", error)),
       _ => Redirect(routes.PetStoreController.index())
