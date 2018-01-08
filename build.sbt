@@ -8,7 +8,7 @@ lazy val `api` = project.in(file("api"))
     resolvers += Resolver.jcenterRepo,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % PlayVersion,
-      "com.github.romastyi" %% "play-boilerplate-api-play26" % "0.0.2-SNAPSHOT",
+      boilerplateApi,
       // Consul service discovery
       "com.ecwid.consul" % "consul-api" % "1.2.4",
       // JWT
@@ -47,3 +47,4 @@ lazy val root = project.in(file("."))
     `petStore-api`, `petStore-impl`,
     `web-gateway`
   )
+  .enablePlugins(FixUnresolvedImports)

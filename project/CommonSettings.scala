@@ -3,6 +3,7 @@ import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
 import play.boilerplate.generators.injection.InjectionProvider
 import play.boilerplate.generators.security.SecurityProvider._
+import play.boilerplate.generators.security.SilhouetteSecurityProvider
 import play.sbt.{PlayImport, PlayLayoutPlugin, PlayScala}
 import sbt._
 import sbt.Keys._
@@ -10,7 +11,7 @@ import sbt.Keys._
 object CommonSettings {
 
   val Version = "0.0.2-SNAPSHOT"
-  val PlayVersion = "2.6.7"
+  val PlayVersion: String = play.core.PlayVersion.current
   val ScaldiVersion = "0.5.17"
   val SilhouetteVersion = "5.0.0"
 
@@ -31,63 +32,35 @@ object CommonSettings {
     resolvers += Opts.resolver.sonatypeSnapshots
   )
 
-  abstract class SilhouetteSecurityProvider(securitySchema: String) extends DefaultSecurity(securitySchema) {
+  val boilerplateApi = PlayBoilerplatePlugin.Imports.api(PlayVersion)
+
+  object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {
 
     import treehugger.forest._
     import definitions._
     import treehuggerDSL._
 
-    def envType: Type
+    override def envType: Type = TYPE_REF("SessionEnv")
 
-    override def controllerImports: Seq[Import] = Seq(
-      IMPORT("com.github.romastyi.api.silhouette", "_"),
-      IMPORT("com.github.romastyi.api.domain", "_"),
-      IMPORT("com.mohiva.play.silhouette.api", "Silhouette")
-    )
-    override def controllerParents: Seq[Type] = Nil
-    override def controllerSelfTypes: Seq[Type] = Nil
-    override def controllerDependencies: Seq[InjectionProvider.Dependency] = Seq(
-      InjectionProvider.Dependency("silhouette", TYPE_REF("Silhouette") TYPE_OF envType)
-    )
+    override def userType: Type = TYPE_REF("UserModel")
 
-    override def serviceImports: Seq[Import] = Seq(
-      IMPORT("com.github.romastyi.api.domain", "_")
-    )
-
-    override def composeActionSecurity(scopes: Seq[SecurityScope]): ActionSecurity = {
-
+    override def parseAuthority(scopes: Seq[SecurityScope]): Seq[Tree] = {
       val roles = scopes.find(_.scope == "roles").map { s =>
         ImmutableSetClass APPLY s.values.map(r => REF(s"UserRole.$r"))
       }.getOrElse {
         REF("UserRole.all")
       }
-      val authority = Seq(REF("WithRoles") APPLYTYPE (envType TYPE_# "A") APPLY roles)
-
-      val userType: Type = TYPE_REF("UserModel")
-      val userValue: ValDef = VAL("user", userType) := REF("request") DOT "identity"
-
-      new ActionSecurity {
-        override def actionMethod(parser: Tree): Tree = {
-          REF("silhouette") DOT "SecuredAction" APPLY authority DOT "async" APPLY parser
-        }
-        override val securityParams: Map[String, Type] = {
-          Map("user" -> userType)
-        }
-        override val securityValues: Map[String, ValDef] = {
-          Map("user" -> userValue)
-        }
-      }
-
+      Seq(REF("WithRoles") APPLYTYPE genericAuthenticator APPLY roles)
     }
 
-  }
+    override def controllerImports: Seq[Import] = super.controllerImports ++ Seq(
+      IMPORT("com.github.romastyi.api.silhouette", "_"),
+      IMPORT("com.github.romastyi.api.domain", "_")
+    )
 
-  object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {
-
-    import treehugger.forest._
-    import treehuggerDSL._
-
-    override def envType: Type = TYPE_REF("SessionEnv")
+    override def serviceImports: Seq[Import] = Seq(
+      IMPORT("com.github.romastyi.api.domain", "_")
+    )
 
   }
 
@@ -171,7 +144,7 @@ object CommonSettings {
       exportJars := true,
       libraryDependencies ++= Seq(
         "com.typesafe.play" %% "play-ws" % PlayVersion,
-        "com.github.romastyi" %% "play-boilerplate-api-play26" % "0.0.2-SNAPSHOT"
+        boilerplateApi
       )
     )
     .enablePlugins(PlayBoilerplatePlugin)
