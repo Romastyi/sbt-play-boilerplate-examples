@@ -10,7 +10,7 @@ import com.mohiva.play.silhouette.api.util.Credentials
 import com.mohiva.play.silhouette.api.Silhouette
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 */
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.boilerplate.api.client.dsl.ServiceLocator
 import scaldi.Module
 
@@ -27,7 +27,7 @@ class PetStoreClientComponents extends Module {
   lazy val credentialsProvider: CredentialsProvider = inject[CredentialsProvider]
 */
 
-  implicit val handler: PetStoreClient.RequestHandler = new PetStoreClient.RequestHandler {
+  val handler: PetStoreClient.RequestHandler = new PetStoreClient.RequestHandler {
 /*
     import play.api.libs.typedmap.TypedMap
     import play.api.mvc.{Headers, RequestHeader}
@@ -62,10 +62,10 @@ class PetStoreClientComponents extends Module {
     override def handleRequest(operationId: String, request: WSRequest, user: Option[UserModel]): Future[WSRequest] = {
       Future.successful(UserJwtRequest.withSession(request, user))
     }
-    override def onSuccess(operationId: String, response: AnyRef, user: Option[UserModel]): Unit = ()
+    override def onSuccess(operationId: String, response: WSResponse, user: Option[UserModel]): Unit = ()
     override def onError(operationId: String, cause: Throwable, user: Option[UserModel]): Unit = ()
   }
 
-  bind [PetStoreService] to new PetStoreClient
+  bind [PetStoreService] to new PetStoreClient(handler)
 
 }

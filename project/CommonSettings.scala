@@ -10,7 +10,7 @@ import sbt.Keys._
 
 object CommonSettings {
 
-  val Version = "0.0.2-SNAPSHOT"
+  val Version = "0.0.2"
   val PlayVersion: String = play.core.PlayVersion.current
   val ScaldiVersion = "0.5.17"
   val SilhouetteVersion = "5.0.0"
