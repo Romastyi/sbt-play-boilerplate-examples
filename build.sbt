@@ -1,5 +1,6 @@
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
+import PlayBoilerplatePlugin.Generators
 import CommonSettings._
 
 lazy val `api` = project.in(file("api"))
@@ -7,21 +8,24 @@ lazy val `api` = project.in(file("api"))
   .settings(
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % PlayVersion,
-      "com.github.romastyi" %% "play-boilerplate-api-play25" % "0.0.2-SNAPSHOT",
+      boilerplateApi,
+      // Consul service discovery
       "com.ecwid.consul" % "consul-api" % "1.2.4",
+      // Play2-Auth library
       "jp.t2v" %% "play2-auth" % "0.14.2",
+      // JWT
       "com.pauldijou" %% "jwt-play" % "0.9.2"
     )
   )
 
-lazy val `auth-api` = ApiProject("auth-api", file("auth-api"))
+lazy val `auth-api` = MyApiProject("auth-api", file("auth-api"))
   .dependsOn(`api`)
-lazy val `auth-impl` = ImplProject("auth-impl", file("auth-impl"), `auth-api`)
-  .settings(generateServer := false)
+lazy val `auth-impl` = MyImplProject("auth-impl", file("auth-impl"), `auth-api`)
+  .settings(generators -= Generators.controller)
 
-lazy val `petStore-api` = ApiProject("petStore-api", file("petStore-api"))
+lazy val `petStore-api` = MyApiProject("petStore-api", file("petStore-api"))
   .dependsOn(`api`, `auth-api`)
-lazy val `petStore-impl` = ImplProject("petStore-impl", file("petStore-impl"), `petStore-api`)
+lazy val `petStore-impl` = MyImplProject("petStore-impl", file("petStore-impl"), `petStore-api`)
   .settings(routesImport += "com.github.romastyi.api.controller.PetStoreController._")
 
 lazy val `web-gateway` = project.in(file("web-gateway"))

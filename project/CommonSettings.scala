@@ -1,7 +1,8 @@
-import play.boilerplate.generators._
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
-import play.boilerplate.generators.injection.InjectionProvider
+import PlayBoilerplatePlugin.{ApiProject, Generators, ImplProject, Imports}
+import play.boilerplate.generators.injection._
+import play.boilerplate.generators.security.Play2AuthSecurityProvider
 import play.boilerplate.generators.security.SecurityProvider._
 import play.sbt.{PlayLayoutPlugin, PlayScala}
 import sbt._
@@ -9,9 +10,8 @@ import sbt.Keys._
 
 object CommonSettings {
 
-  val Version = "0.0.1-SNAPSHOT"
-  val PlayVersion = "2.5.18"
-  val ScaldiVersion = "0.5.15"
+  val Version = "0.0.3"
+  val PlayVersion: String = play.core.PlayVersion.current
 
   val common = Seq(
     organization := "com.github.romastyi",
@@ -24,10 +24,12 @@ object CommonSettings {
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % PlayVersion,
       "com.typesafe.play" %% "play-json" % PlayVersion,
-      "org.scaldi" %% "scaldi-play" % ScaldiVersion
+      Imports.scaldi(PlayVersion)
     ),
     resolvers += Opts.resolver.sonatypeSnapshots
   )
+
+  val boilerplateApi = Imports.api(PlayVersion)
 
   object Auth {
 
@@ -46,7 +48,7 @@ object CommonSettings {
 
   }
 
-  object AuthSecurityProvider extends security.Play2AuthSecurityProvider(
+  object AuthSecurityProvider extends Play2AuthSecurityProvider(
     "UserModel",
     "UserAuthConfig",
     "session",
@@ -103,66 +105,22 @@ object CommonSettings {
 
   }
 
-  object ApiGenSettings extends GenSettings {
-    override def apply(fileName: String, basePackageName: String, codeProvidedPackage: String): GeneratorSettings =
-      DefaultGeneratorSettings(
-        fileName,
-        basePackageName,
-        codeProvidedPackage,
-        securityProvider = JwtSecurityProvider
-      )
-  }
-
-  def ApiProject(name: String, dir: File): Project = Project(name, dir)
+  def MyApiProject(name: String, dir: File): Project = ApiProject(name, dir)(PlayVersion)
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      generateModel := true,
-      generateJson := true,
-      generateService := true,
-      generateClient := true,
-      generatorSettings := ApiGenSettings,
-      unmanagedResourceDirectories in Compile += generatorSourceDir.value,
-      exportJars := true,
-      libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play-ws" % PlayVersion,
-        "com.github.romastyi" %% "play-boilerplate-api-play25" % "0.0.2-SNAPSHOT"
-      )
+      securityProvider := JwtSecurityProvider
     )
-    .enablePlugins(PlayBoilerplatePlugin)
 
-  object ImplGenSettings extends GenSettings {
-    override def apply(fileName: String, basePackageName: String, codeProvidedPackage: String): GeneratorSettings =
-      DefaultGeneratorSettings(
-        fileName,
-        basePackageName,
-        codeProvidedPackage,
-        securityProvider = JwtSecurityProvider,
-        injectionProvider = new injection.ScaldiInjectionProvider()
-      )
-  }
-
-  def ImplProject(name: String, dir: File, api: Project): Project = Project(name, dir)
+  def MyImplProject(name: String, dir: File, api: Project): Project = ImplProject(name, dir, api)(PlayVersion)
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      generateModel := false,
-      generateJson := false,
-      generateServer := true,
-      generateService := false,
-      generateRoutes := true,
-      generateRoutesCodeGenerator := InjectedRoutesCodeGenerator,
-      generatorSettings := ImplGenSettings,
-      generatorsSources += {
-        val dependencies = (exportedProducts in Compile in api).value
-        val toDirectory = (sourceManaged in Compile).value
-        ClasspathJarsWatcher(dependencies, toDirectory)
-      },
+      securityProvider := JwtSecurityProvider,
+      injectionProvider := ScaldiInjectionProvider,
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )
-    .enablePlugins(PlayBoilerplatePlugin)
     .enablePlugins(PlayScala)
     .disablePlugins(PlayLayoutPlugin)
-    .dependsOn(api)
 
 }
