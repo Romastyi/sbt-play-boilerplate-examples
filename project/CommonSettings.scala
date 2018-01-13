@@ -1,7 +1,7 @@
-import play.boilerplate.generators._
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
-import play.boilerplate.generators.injection.InjectionProvider
+import PlayBoilerplatePlugin.{Generators, ApiProject, ImplProject}
+import play.boilerplate.generators.injection._
 import play.boilerplate.generators.security.SecurityProvider._
 import play.boilerplate.generators.security.SilhouetteSecurityProvider
 import play.sbt.{PlayImport, PlayLayoutPlugin, PlayScala}
@@ -10,7 +10,7 @@ import sbt.Keys._
 
 object CommonSettings {
 
-  val Version = "0.0.2"
+  val Version = "0.0.3"
   val PlayVersion: String = play.core.PlayVersion.current
   val ScaldiVersion = "0.5.17"
   val SilhouetteVersion = "5.0.0"
@@ -121,66 +121,24 @@ object CommonSettings {
 
   }
 
-  object ApiGenSettings extends GenSettings {
-    override def apply(fileName: String, basePackageName: String, codeProvidedPackage: String): GeneratorSettings =
-      DefaultGeneratorSettings(
-        fileName,
-        basePackageName,
-        codeProvidedPackage,
-        securityProvider = JwtSecurityProvider
-      )
-  }
-
-  def ApiProject(name: String, dir: File): Project = Project(name, dir)
+  def MyApiProject(name: String, dir: File): Project = ApiProject(name, dir)(PlayVersion)
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      generateModel := true,
-      generateJson := true,
-      generateService := true,
-      generateClient := true,
-      generatorSettings := ApiGenSettings,
-      unmanagedResourceDirectories in Compile += generatorSourceDir.value,
-      exportJars := true,
-      libraryDependencies ++= Seq(
-        "com.typesafe.play" %% "play-ws" % PlayVersion,
-        boilerplateApi
-      )
+      securityProvider := JwtSecurityProvider
     )
-    .enablePlugins(PlayBoilerplatePlugin)
 
-  object ImplGenSettings extends GenSettings {
-    override def apply(fileName: String, basePackageName: String, codeProvidedPackage: String): GeneratorSettings =
-      DefaultGeneratorSettings(
-        fileName,
-        basePackageName,
-        codeProvidedPackage,
-        securityProvider = JwtSecurityProvider,
-        injectionProvider = new injection.ScaldiInjectionProvider()
-      )
-  }
-
-  def ImplProject(name: String, dir: File, api: Project): Project = Project(name, dir)
+  def MyImplProject(name: String, dir: File, api: Project): Project = ImplProject(name, dir, api)(PlayVersion)
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      generateModel := false,
-      generateJson := false,
-      generateServer := true,
-      generateService := false,
-      generateRoutes := true,
-      generateRoutesCodeGenerator := InjectedRoutesCodeGenerator,
-      generatorSettings := ImplGenSettings,
-      generatorsSources += {
-        val dependencies = (exportedProducts in Compile in api).value
-        val toDirectory = (sourceManaged in Compile).value
-        ClasspathJarsWatcher(dependencies, toDirectory)
-      },
+      generators -= Generators.controller,
+      generators += Generators.injectedController,
+      securityProvider := JwtSecurityProvider,
+      injectionProvider := ScaldiInjectionProvider,
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )
-    .enablePlugins(PlayBoilerplatePlugin)
     .enablePlugins(PlayScala)
     .disablePlugins(PlayLayoutPlugin)
-    .dependsOn(api)
 
 }

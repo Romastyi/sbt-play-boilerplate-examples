@@ -4,10 +4,10 @@ import com.github.romastyi.api.domain.{UserAuthority, UserJwtSession, UserModel}
 import pdi.jwt.JwtSession
 import pdi.jwt.JwtSession._
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{Controller, RequestHeader}
+import play.api.mvc.{BaseController, RequestHeader}
 import play.api.mvc.Security.AuthenticatedBuilder
 
-trait UserJwtController { this: Controller =>
+trait UserJwtController { this: BaseController =>
 
   def realm: String = "Secured"
 
