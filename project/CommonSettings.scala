@@ -1,6 +1,6 @@
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
-import PlayBoilerplatePlugin.{Generators, ApiProject, ImplProject}
+import PlayBoilerplatePlugin.{Generators, Imports, ApiProject, ImplProject}
 import play.boilerplate.generators.injection._
 import play.boilerplate.generators.security.SecurityProvider._
 import play.boilerplate.generators.security.SilhouetteSecurityProvider
@@ -12,7 +12,6 @@ object CommonSettings {
 
   val Version = "0.0.3"
   val PlayVersion: String = play.core.PlayVersion.current
-  val ScaldiVersion = "0.5.17"
   val SilhouetteVersion = "5.0.0"
 
   val common = Seq(
@@ -26,13 +25,13 @@ object CommonSettings {
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % PlayVersion,
       "com.typesafe.play" %% "play-json" % PlayVersion,
-      "org.scaldi" %% "scaldi-play" % ScaldiVersion
+      Imports.scaldi(PlayVersion)
     ),
     libraryDependencies += PlayImport.guice,
     resolvers += Opts.resolver.sonatypeSnapshots
   )
 
-  val boilerplateApi = PlayBoilerplatePlugin.Imports.api(PlayVersion)
+  val boilerplateApi = Imports.api(PlayVersion)
 
   object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {
 
