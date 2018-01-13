@@ -19,4 +19,8 @@ trait UserAuthConfigImpl extends UserAuthConfig { this: Controller =>
     Future.successful(Redirect(routes.LoginController.login()))
   }
 
+  override def authorizationFailed(request: RequestHeader)(implicit context: ExecutionContext): Future[Result] = {
+    Future.successful(Redirect(routes.LoginController.login()))
+  }
+
 }

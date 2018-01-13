@@ -1,3 +1,4 @@
+import play.PlayImport.PlayKeys._
 import play.boilerplate.PlayBoilerplatePlugin
 import PlayBoilerplatePlugin.Keys._
 import PlayBoilerplatePlugin.Generators
@@ -12,9 +13,9 @@ lazy val `api` = project.in(file("api"))
       // Consul service discovery
       "com.ecwid.consul" % "consul-api" % "1.2.4",
       // Play2-Auth library
-      "jp.t2v" %% "play2-auth" % "0.14.2",
+      "jp.t2v" %% "play2-auth" % "0.13.2",
       // JWT
-      "com.pauldijou" %% "jwt-play" % "0.9.2"
+      "com.pauldijou" %% "jwt-play" % "0.2.1"
     )
   )
 
@@ -31,7 +32,6 @@ lazy val `petStore-impl` = MyImplProject("petStore-impl", file("petStore-impl"),
 lazy val `web-gateway` = project.in(file("web-gateway"))
   .settings(common: _ *)
   .enablePlugins(PlayScala)
-  .disablePlugins(PlayLayoutPlugin)
   .settings(
     sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
   )

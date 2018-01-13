@@ -39,18 +39,14 @@ paths:
         - text/xml
         - text/html
       parameters:
-        - name: tags
+        - name: tag
           in: query
-          description: tags to filter by
+          description: tag to filter by
           required: false
-          type: array
-          items:
-#            $ref: '#/definitions/PetTag'
-            type: string
-            enum:
-              - young
-              - mature
-          collectionFormat: csv
+          type: string
+          enum:
+            - young
+            - mature
         - name: pager.drop
           in: query
           description: number of results to skip from the beginning

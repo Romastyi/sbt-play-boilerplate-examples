@@ -1,5 +1,0 @@
-GET                 /api/pets                                                   com.github.romastyi.api.controller.PetStoreController.findPets(pager: com.github.romastyi.api.service.PetStoreService.FindPetsPager, tags: Option[List[com.github.romastyi.api.service.PetStoreService.FindPetsTags.Value]])
-POST                /api/pets                                                   com.github.romastyi.api.controller.PetStoreController.addPet()
-GET                 /api/pets/$id<[0-9]+>                                       com.github.romastyi.api.controller.PetStoreController.findPetById(id: Long)
-DELETE              /api/pets/$id<[0-9]+>                                       com.github.romastyi.api.controller.PetStoreController.deletePet(id: Long)
-GET                 /api/pets/:tag                                              com.github.romastyi.api.controller.PetStoreController.findPetByTag(tag: com.github.romastyi.api.service.PetStoreService.FindPetByTagTag.Value)

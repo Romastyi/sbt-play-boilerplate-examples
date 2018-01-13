@@ -10,6 +10,7 @@ import play.api.Logger
 import play.api.mvc.{Action, AnyContent, Controller}
 import play.api.libs.concurrent.Execution.Implicits._
 import scaldi.{Injectable, Injector}
+import views.html
 
 import scala.concurrent.Future
 

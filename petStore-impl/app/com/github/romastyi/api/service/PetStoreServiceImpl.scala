@@ -22,7 +22,7 @@ object PetStoreServiceImpl extends PetStoreService {
     *
     *
     */
-  override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], user: UserModel): Future[FindPetsResponse] = {
+  override def findPets(pager: FindPetsPager, tags: Option[FindPetsTag.Value], user: UserModel): Future[FindPetsResponse] = {
 
     def dropN(n: Int): Seq[Pet] => Seq[Pet] = _.drop(n)
     def takeN(n: Int): Seq[Pet] => Seq[Pet] = _.take(n)

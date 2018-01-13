@@ -4,7 +4,7 @@ import PlayBoilerplatePlugin.{ApiProject, Generators, ImplProject, Imports}
 import play.boilerplate.generators.injection._
 import play.boilerplate.generators.security.Play2AuthSecurityProvider
 import play.boilerplate.generators.security.SecurityProvider._
-import play.sbt.{PlayLayoutPlugin, PlayScala}
+import play.PlayScala
 import sbt._
 import sbt.Keys._
 
@@ -116,11 +116,12 @@ object CommonSettings {
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
+      generators -= Generators.injectedRoutes,
+      generators += Generators.dynamicRoutes,
       securityProvider := JwtSecurityProvider,
       injectionProvider := ScaldiInjectionProvider,
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )
     .enablePlugins(PlayScala)
-    .disablePlugins(PlayLayoutPlugin)
 
 }
