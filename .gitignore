@@ -6,7 +6,7 @@ src/main/scala-2.11
 .project
 .cache
 .settings
-.idea
+.idea/
 .history
 logs
 *.class

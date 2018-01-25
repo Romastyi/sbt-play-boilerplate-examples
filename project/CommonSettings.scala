@@ -116,8 +116,8 @@ object CommonSettings {
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      generators -= Generators.injectedRoutes,
-      generators += Generators.dynamicRoutes,
+      generators -= Generators.defaultInjectedRoutes,
+      generators += Generators.defaultDynamicRoutes,
       securityProvider := JwtSecurityProvider,
       injectionProvider := ScaldiInjectionProvider,
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath

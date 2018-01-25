@@ -6,5 +6,3 @@ POST        /pet                           @com.github.romastyi.controller.PetSt
 POST        /pet/$id<[0-9]+>/delete        @com.github.romastyi.controller.PetStoreController.delete(id: Long)
 
 GET         /assets/*file                  controllers.Assets.at(path="/public", file)
-
-->          /                              auth.Routes
