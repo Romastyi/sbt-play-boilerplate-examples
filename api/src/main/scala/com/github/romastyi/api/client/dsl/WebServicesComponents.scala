@@ -9,7 +9,7 @@ import scaldi.Module
 class WebServicesComponents extends Module {
   private lazy val config = inject[Configuration].underlying
   implicit lazy val app: Application = inject[Application]
-  implicit lazy val system: ActorSystem = ActorSystem()
+  implicit lazy val system: ActorSystem = inject[ActorSystem]
   implicit lazy val circuitBreakers: CircuitBreakersPanel = AkkaCircuitBreakersPanel.instance(config.getConfig("circuit-breaker"))
   bind [WSClient] to WS.client
   bind [CircuitBreakersPanel] to circuitBreakers
