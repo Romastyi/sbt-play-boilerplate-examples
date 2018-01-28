@@ -1,2 +1,2 @@
-POST                /api/login                                                  com.github.romastyi.api.controller.AuthController.login()
-GET                 /api/logout                                                 com.github.romastyi.api.controller.AuthController.logout()
+POST                /internal/api/login                                         com.github.romastyi.api.controller.AuthController.login()
+GET                 /internal/api/logout                                        com.github.romastyi.api.controller.AuthController.logout()

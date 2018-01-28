@@ -1,10 +1,8 @@
 GET         /                              com.github.romastyi.controller.LoginController.login
 POST        /login                         com.github.romastyi.controller.LoginController.authenticate
 GET         /logout                        com.github.romastyi.controller.LoginController.logout
-GET         /index                         @com.github.romastyi.controller.PetStoreController.index
-POST        /pet                           @com.github.romastyi.controller.PetStoreController.addPet()
-POST        /pet/$id<[0-9]+>/delete        @com.github.romastyi.controller.PetStoreController.delete(id: Long)
+GET         /index                         com.github.romastyi.controller.PetStoreController.index
+POST        /pet                           com.github.romastyi.controller.PetStoreController.addPet()
+POST        /pet/$id<[0-9]+>/delete        com.github.romastyi.controller.PetStoreController.delete(id: Long)
 
 GET         /assets/*file                  controllers.Assets.at(path="/public", file)
-
-->          /                              auth.Routes

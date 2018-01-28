@@ -16,8 +16,8 @@ class LoginController(implicit inj: Injector) extends InjectedController with In
 
   implicit lazy val ec: ExecutionContext = controllerComponents.executionContext
 
-  private val silhouette = inject[Silhouette[SessionEnv]]
-  private val credentialsProvider = inject[CredentialsProvider]
+  private lazy val silhouette = inject[Silhouette[SessionEnv]]
+  private lazy val credentialsProvider = inject[CredentialsProvider]
 
   /** Your application's login form.  Alter it to fit your application */
   val loginForm = Form {

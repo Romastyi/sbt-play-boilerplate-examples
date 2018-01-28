@@ -18,10 +18,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PetStoreClientComponents extends Module {
 
-  implicit lazy val ec: ExecutionContext = inject[ExecutionContext]
-  implicit lazy val ws: WSClient = inject[WSClient]
-  implicit lazy val locator: ServiceLocator = inject[ServiceLocator]('config)/*('consul)*/
-
 /*
   lazy val silhouette: Silhouette[JWTEnv] = inject[Silhouette[JWTEnv]]
   lazy val credentialsProvider: CredentialsProvider = inject[CredentialsProvider]
@@ -66,6 +62,11 @@ class PetStoreClientComponents extends Module {
     override def onError(operationId: String, cause: Throwable, user: Option[UserModel]): Unit = ()
   }
 
-  bind [PetStoreService] to new PetStoreClient(handler)
+  bind [PetStoreService] to {
+    implicit val ec: ExecutionContext = inject[ExecutionContext]
+    implicit val ws: WSClient = inject[WSClient]
+    implicit val locator: ServiceLocator = inject[ServiceLocator]('config)/*('consul)*/
+    new PetStoreClient(handler)
+  }
 
 }

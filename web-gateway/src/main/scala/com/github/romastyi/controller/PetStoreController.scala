@@ -18,8 +18,8 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
 
   implicit lazy val ec: ExecutionContext = controllerComponents.executionContext
 
-  private val silhouette = inject[Silhouette[SessionEnv]]
-  private val petStore = inject[PetStoreService]
+  private lazy val silhouette = inject[Silhouette[SessionEnv]]
+  private lazy val petStore = inject[PetStoreService]
 
   val petForm = Form {
     mapping("petName" -> nonEmptyText)(
