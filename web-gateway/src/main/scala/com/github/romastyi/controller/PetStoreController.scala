@@ -33,8 +33,10 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
     petStore.findPets(FindPetsPager(drop = Some(0), limit = None), None, user).map {
       case FindPetsOk(list) =>
         Right(list)
-      case FindPetsDefault(error, status) =>
-        Left(s"STATUS: $status, ERROR: $error")
+      case FindPetsDefault(error, code) =>
+        Left(s"STATUS: $code, ERROR: $error")
+      case UnexpectedResult(error, code, _) =>
+        Left(s"STATUS: $code, ERROR: $error")
     }.recover {
       case cause =>
         Left("ERROR: " + cause.getMessage)
@@ -54,8 +56,10 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
     petStore.addPet(newPet, user).map {
       case AddPetOk(pet) =>
         Right(pet)
-      case AddPetDefault(error, status) =>
-        Left(s"STATUS: $status, ERROR: $error")
+      case AddPetDefault(error, code) =>
+        Left(s"STATUS: $code, ERROR: $error")
+      case UnexpectedResult(error, code, _) =>
+        Left(s"STATUS: $code, ERROR: $error")
     }.recover {
       case cause =>
         Left("ERROR: " + cause.getMessage)
@@ -80,8 +84,10 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
     petStore.deletePet(id, user).map {
       case DeletePetNoContent =>
         Right(())
-      case DeletePetDefault(error, status) =>
-        Left(s"STATUS: $status, ERROR: $error")
+      case DeletePetDefault(error, code) =>
+        Left(s"STATUS: $code, ERROR: $error")
+      case UnexpectedResult(error, code, _) =>
+        Left(s"STATUS: $code, ERROR: $error")
     }.recover {
       case cause =>
         Left("ERROR: " + cause.getMessage)

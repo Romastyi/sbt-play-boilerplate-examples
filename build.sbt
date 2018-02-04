@@ -26,8 +26,8 @@ lazy val `auth-api` = MyApiProject("auth-api", file("auth-api"))
   .dependsOn(`api`)
 lazy val `auth-impl` = MyImplProject("auth-impl", file("auth-impl"), `auth-api`)
   .settings(
-    generators --= Seq(Generators.injectedController, Generators.defaultInjectedRoutes),
-    generators += Generators.injectedRoutes("/internal")
+    generators --= Seq(Generators.injectedController, Generators.injectedRoutes),
+    generators += Generators.injectedRoutesWithPrefix("/internal")
   )
 
 lazy val `petStore-api` = MyApiProject("petStore-api", file("petStore-api"))
