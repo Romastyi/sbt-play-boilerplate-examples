@@ -11,7 +11,7 @@ lazy val `api` = project.in(file("api"))
       "com.typesafe.play" %% "play-ws" % PlayVersion,
       boilerplateApi,
       // Consul service discovery
-      "com.ecwid.consul" % "consul-api" % "1.2.4",
+      consul,
       // JWT
       "com.pauldijou" %% "jwt-play" % "0.14.1",
       // silhouette

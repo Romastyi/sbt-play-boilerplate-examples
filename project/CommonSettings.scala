@@ -32,6 +32,7 @@ object CommonSettings {
   )
 
   val boilerplateApi = Imports.api(PlayVersion)
+  val consul = Imports.component("api-consul")
 
   object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {
 
@@ -102,17 +103,20 @@ object CommonSettings {
       val authority = Seq(REF("UserAuthority") APPLY roles)
 
       val userType: Type = TYPE_REF("UserModel")
-      val userValue: ValDef = VAL("user", userType) := REF("request") DOT "user"
+      val userValue: ValDef = VAL("logged", userType) := REF("request") DOT "user"
 
       new ActionSecurity {
         override def actionMethod(parser: Tree): Tree = {
           REF("Authenticated") APPLY authority DOT "async" APPLY parser
         }
         override val securityParams: Map[String, Type] = {
-          Map("user" -> userType)
+          Map("logged" -> userType)
         }
         override val securityValues: Map[String, ValDef] = {
-          Map("user" -> userValue)
+          Map("logged" -> userValue)
+        }
+        override def securityDocs: Map[String, String] = {
+          Map("logged" -> "Current logged user")
         }
       }
 
