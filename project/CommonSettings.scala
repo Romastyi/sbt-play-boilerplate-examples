@@ -109,14 +109,14 @@ object CommonSettings {
         override def actionMethod(parser: Tree): Tree = {
           REF("Authenticated") APPLY authority DOT "async" APPLY parser
         }
-        override val securityParams: Map[String, Type] = {
-          Map("logged" -> userType)
+        override val securityParams: Seq[(String, Type)] = {
+          ("logged" -> userType) :: Nil
         }
-        override val securityValues: Map[String, ValDef] = {
-          Map("logged" -> userValue)
+        override val securityValues: Seq[(String, ValDef)] = {
+          ("logged" -> userValue) :: Nil
         }
-        override def securityDocs: Map[String, String] = {
-          Map("logged" -> "Current logged user")
+        override val securityDocs: Seq[(String, String)] = {
+          ("logged" -> "Current logged user") :: Nil
         }
       }
 
