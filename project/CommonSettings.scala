@@ -10,11 +10,11 @@ import sbt.Keys._
 
 object CommonSettings {
 
-  val Version = "0.0.3"
+  val Version = "0.0.4"
   val PlayVersion: String = play.core.PlayVersion.current
   val SilhouetteVersion = "5.0.0"
 
-  val common = Seq(
+  val common: Seq[Def.SettingsDefinition] = Seq(
     organization := "com.github.romastyi",
     scalaVersion := "2.12.4",
     version := PlayVersion + "_" + Version,
@@ -24,7 +24,6 @@ object CommonSettings {
     ),
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % PlayVersion,
-      "com.typesafe.play" %% "play-json" % PlayVersion,
       Imports.scaldi(PlayVersion)
     ),
     libraryDependencies += PlayImport.guice,
@@ -128,7 +127,7 @@ object CommonSettings {
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      securityProvider := JwtSecurityProvider
+      securityProviders := Seq(JwtSecurityProvider)
     )
 
   def MyImplProject(name: String, dir: File, api: Project): Project = ImplProject(name, dir, api)(PlayVersion)
@@ -137,7 +136,7 @@ object CommonSettings {
       generatorDestPackage := "com.github.romastyi.api",
       generators -= Generators.controller,
       generators += Generators.injectedController,
-      securityProvider := JwtSecurityProvider,
+      securityProviders := Seq(JwtSecurityProvider),
       injectionProvider := ScaldiInjectionProvider,
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )

@@ -11,3 +11,4 @@ src/main/scala-2.11
 logs
 *.class
 *.log
+*.http
