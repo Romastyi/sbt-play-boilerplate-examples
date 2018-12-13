@@ -10,7 +10,7 @@ import com.github.romastyi.api.model._
 import scala.collection.mutable.{Seq => MSeq}
 import scala.concurrent.Future
 
-object PetStoreServiceImpl extends PetStoreService {
+object PetStoreServiceImpl extends PetStoreService[Future] {
 
   import PetStoreService._
 
