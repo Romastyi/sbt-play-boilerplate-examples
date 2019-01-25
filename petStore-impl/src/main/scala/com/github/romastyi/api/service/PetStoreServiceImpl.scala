@@ -10,17 +10,19 @@ import com.github.romastyi.api.model._
 import scala.collection.mutable.{Seq => MSeq}
 import scala.concurrent.Future
 
-object PetStoreServiceImpl extends PetStoreService {
+object PetStoreServiceImpl extends PetStoreService[Future] {
 
   import PetStoreService._
 
   private val ids = new java.util.concurrent.atomic.AtomicLong(0l)
   private var pets: MSeq[Pet] = MSeq.empty
 
+
   /**
     * Returns all pets from the system that the user has access to
     *
-    *
+    * @param pager Class, that composed query parameters: pager.drop, pager.limit
+    * @param tags  tags to filter by
     */
   override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], user: UserModel): Future[FindPetsResponse] = {
 

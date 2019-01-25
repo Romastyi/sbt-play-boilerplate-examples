@@ -3,8 +3,8 @@ package com.github.romastyi.module
 import com.github.romastyi.api.client.{PetStoreClient, PetStoreCredentials}
 import com.github.romastyi.api.client.dsl.UserJwtRequest
 import com.github.romastyi.api.service.PetStoreService
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.boilerplate.api.client.dsl.{Credentials, RequestHandler, ServiceLocator}
+import play.boilerplate.api.client.dsl.Compat._
 import scaldi.Module
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,7 +24,7 @@ class PetStoreClientComponents extends Module {
     override def onError(operationId: String, cause: Throwable, credentials: Credentials[PetStoreClient]): Unit = ()
   }
 
-  bind [PetStoreService] to {
+  bind [PetStoreService[Future]] to {
     implicit val ec: ExecutionContext = inject[ExecutionContext]
     implicit val ws: WSClient = inject[WSClient]
     implicit val locator: ServiceLocator = inject[ServiceLocator]('config)/*('consul)*/
