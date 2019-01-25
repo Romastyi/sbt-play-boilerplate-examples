@@ -30,7 +30,7 @@ object CommonSettings {
     resolvers += Opts.resolver.sonatypeSnapshots
   )
 
-  val boilerplateApi = Imports.serverApi(PlayVersion)
+  val boilerplateClientApi = Imports.clientApi(PlayVersion)
   val consul = Imports.component("api-client-consul")
 
   object AuthSecurityProvider extends SilhouetteSecurityProvider("session") {

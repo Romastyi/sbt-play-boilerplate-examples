@@ -9,7 +9,7 @@ lazy val `api` = project.in(file("api"))
     resolvers += Resolver.jcenterRepo,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-ws" % PlayVersion,
-      boilerplateApi,
+      boilerplateClientApi,
       // Consul service discovery
       consul,
       // JWT
