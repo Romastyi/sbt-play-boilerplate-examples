@@ -33,7 +33,14 @@ lazy val `auth-impl` = MyImplProject("auth-impl", file("auth-impl"), `auth-api`)
 lazy val `petStore-api` = MyApiProject("petStore-api", file("petStore-api"))
   .dependsOn(`api`, `auth-api`)
 lazy val `petStore-impl` = MyImplProject("petStore-impl", file("petStore-impl"), `petStore-api`)
-  .settings(routesImport += "com.github.romastyi.api.controller.PetStoreController._")
+  .settings(
+    routesImport += "com.github.romastyi.api.controller.PetStoreController._",
+    libraryDependencies ++= Seq(
+      "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
+      "org.mockito" % "mockito-core" % "2.23.4" % "test"
+    )
+  )
 
 lazy val `web-gateway` = project.in(file("web-gateway"))
   .settings(common: _ *)
