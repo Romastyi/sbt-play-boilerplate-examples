@@ -38,21 +38,43 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
     s.dropWhile(_ == '&').reverse.dropWhile(_ == '&').reverse
   }
 
+  private def parseQueryParams(query: String): Map[String, Seq[String]] = {
+    query.split('&').map(_.split('=')).groupBy(_.head).mapValues { arr =>
+      val values = arr.flatMap(_.tail)
+      if (values.isEmpty) Vector("") else values.toVector
+    }
+  }
+
   "FindPetsPager render" in {
     forAll { pager: FindPetsPager =>
-      fakeClient.FindPetsPagerQueryParameter.render("pager", pager) must be(trimAmp(FindPetsPagerQueryBindable.unbind("pager", pager)))
+      val renderer = fakeClient.FindPetsPagerQueryParameter
+      val bindable = FindPetsPagerQueryBindable
+      val query = renderer.render("pager", pager)
+      val params = parseQueryParams(query)
+      query must be(trimAmp(bindable.unbind("pager", pager)))
+      bindable.bind("pager", params) must be(Some(Right(pager.copy(
+        drop = pager.drop match {
+          case None => Some(-1) // default value
+          case other => other
+        }
+      ))))
     }
   }
 
   "FindPetsTags render" in {
     forAll { tags: Option[List[FindPetsTags.Value]] =>
-      QueryParameter.optionQueryParameter(fakeClient.FindPetsTagsValueListQueryParameter).render("tags", tags) must be(trimAmp(QueryStringBindable.bindableOption[List[FindPetsTags.Value]].unbind("tags", tags)))
+      val renderer: QueryParameter[Option[List[FindPetsTags.Value]]] = QueryParameter.optionQueryParameter(fakeClient.FindPetsTagsValueListQueryParameter)
+      val bindable: QueryStringBindable[Option[List[FindPetsTags.Value]]] = QueryStringBindable.bindableOption[List[FindPetsTags.Value]]
+      val query = renderer.render("tags", tags)
+      val params = parseQueryParams(query)
+      query must be(trimAmp(bindable.unbind("tags", tags)))
+      bindable.bind("tags", params) must be(Some(Right(tags)))
     }
   }
 
   "findPets with query parameters" in {
     forAll { tags: Option[List[FindPetsTags.Value]] =>
-      val pager = FindPetsPager(Some(1), None)
+      val pager = FindPetsPager(Some(1), Some(3))
       await(fakeClient.findPets(pager, tags, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
     }
   }
