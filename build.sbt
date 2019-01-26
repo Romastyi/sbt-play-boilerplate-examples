@@ -26,15 +26,14 @@ lazy val `auth-api` = MyApiProject("auth-api", file("auth-api"))
   .dependsOn(`api`)
 lazy val `auth-impl` = MyImplProject("auth-impl", file("auth-impl"), `auth-api`)
   .settings(
-    generators --= Seq(Generators.injectedController, Generators.injectedRoutes),
-    generators += Generators.injectedRoutesWithPrefix("/internal")
+    generators --= Seq(Generators.injectedController, Generators.sirdRoutes),
+    generators += Generators.sirdRoutesWithPrefix("/internal")
   )
 
 lazy val `petStore-api` = MyApiProject("petStore-api", file("petStore-api"))
   .dependsOn(`api`, `auth-api`)
 lazy val `petStore-impl` = MyImplProject("petStore-impl", file("petStore-impl"), `petStore-api`)
   .settings(
-    routesImport += "com.github.romastyi.api.controller.PetStoreController._",
     libraryDependencies ++= Seq(
       "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
       "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",

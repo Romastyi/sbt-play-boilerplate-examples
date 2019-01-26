@@ -73,8 +73,8 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
   }
 
   "findPets with query parameters" in {
-    forAll { tags: Option[List[FindPetsTags.Value]] =>
-      val pager = FindPetsPager(Some(1), Some(3))
+    forAll(minSuccessful(100)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
+      val tags = tagsSet.map(_.toList)
       await(fakeClient.findPets(pager, tags, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
     }
   }

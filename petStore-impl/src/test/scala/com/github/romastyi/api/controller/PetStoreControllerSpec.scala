@@ -17,7 +17,8 @@ class PetStoreControllerSpec extends PlaySpec with BaseOneAppPerSuite with Prope
   import PetStoreService._
 
   "findPets with query parameters" in {
-    forAll { (pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]]) =>
+    forAll(minSuccessful(100)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
+      val tags = tagsSet.map(_.toList)
       val urlPath = "/api/pets?" + FindPetsPagerQueryBindable.unbind("pager", pager) +
         "&" + QueryStringBindable.bindableOption[List[FindPetsTags.Value]].unbind("tags", tags)
       val Some(result) = route(app, withUser(FakeRequest(GET, urlPath), UserModel.Admin))
