@@ -1,7 +1,10 @@
 package com.github.romastyi.api
 
+import java.io.File
+import java.nio.file.{StandardCopyOption, Files}
+
 import com.github.romastyi.api.domain.{UserJwtSession, UserModel}
-import com.github.romastyi.api.model.{NewPet, Pet, PetTag}
+import com.github.romastyi.api.model.{ApiResponse, NewPet, Pet, PetTag}
 import com.github.romastyi.api.service.PetStoreService
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatestplus.play.FakeApplicationFactory
@@ -12,6 +15,7 @@ import scaldi.Module
 import scaldi.play.ScaldiApplicationBuilder
 
 import scala.concurrent.Future
+import scala.util.Random
 
 trait CommonHelpers extends FakeApplicationFactory {
 
@@ -24,6 +28,14 @@ trait CommonHelpers extends FakeApplicationFactory {
     Pet(4, "Raccoon", Some(PetTag.Young :: Nil)),
     Pet(5, "Fish", Some(PetTag.Young :: PetTag.Mature :: Nil))
   )
+
+  def petForm(id: Long, name: String, status: Option[String]): Pet = {
+    Pet(
+      id = id,
+      name = name,
+      tag = status.map(PetTag.withName).map(List(_))
+    )
+  }
 
   implicit class PetsOps(pets: List[Pet]) {
 
@@ -53,6 +65,8 @@ trait CommonHelpers extends FakeApplicationFactory {
 
   }
 
+  def getRandomString(length: Int): String = Random.alphanumeric.take(length).mkString("")
+
   def mockService: PetStoreService[Future] = new PetStoreService[Future] {
     override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], logged: UserModel): Future[FindPetsResponse] = {
       Future.successful(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
@@ -61,6 +75,17 @@ trait CommonHelpers extends FakeApplicationFactory {
     override def findPetById(id: Long, logged: UserModel): Future[FindPetByIdResponse] = ???
     override def deletePet(id: Long, logged: UserModel): Future[DeletePetResponse] = ???
     override def findPetByTag(tag: FindPetByTagTag.Value, logged: UserModel): Future[FindPetByTagResponse] = ???
+    override def updatePetWithForm(id: Long, name: String, status: Option[String], logged: UserModel): Future[UpdatePetWithFormResponse] = {
+      Future.successful(UpdatePetWithFormOk(petForm(id, name, status)))
+    }
+    override def uploadFile(petId: Long, additionalMetadata: Option[String], file: File, logged: UserModel): Future[UploadFileResponse] = {
+      val tmpFile = Files.createTempFile(s"test-$petId-${getRandomString(20)}", ".tmp")
+      Future.successful(UploadFileOk(ApiResponse(
+        code = Some(200),
+        `type` = additionalMetadata,
+        message = Some(Files.move(file.toPath, tmpFile, StandardCopyOption.REPLACE_EXISTING).toAbsolutePath.toString)
+      )))
+    }
   }
 
   class FakeService extends Module {
@@ -80,5 +105,7 @@ trait CommonHelpers extends FakeApplicationFactory {
   } yield FindPetsPager(drop = drop, limit = limit))
 
   implicit val findPetsTagsValueGen: Arbitrary[FindPetsTags.Value] = Arbitrary(Gen.oneOf(FindPetsTags.values.toIndexedSeq))
+
+  implicit val petTagValueGen: Arbitrary[PetTag.Value] = Arbitrary(Gen.oneOf(PetTag.values.toIndexedSeq))
 
 }

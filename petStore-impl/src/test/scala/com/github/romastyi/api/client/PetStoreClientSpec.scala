@@ -1,13 +1,16 @@
 package com.github.romastyi.api.client
 
 import java.net.URI
+import java.nio.file.{Files, Paths}
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.github.romastyi.api.CommonHelpers
 import com.github.romastyi.api.controller.PetStoreController
 import com.github.romastyi.api.domain.UserModel
+import com.github.romastyi.api.model.PetTag
 import com.github.romastyi.api.service.PetStoreService
+import org.scalacheck.Gen
 import org.scalatest.prop.PropertyChecks
 import org.scalatestplus.play.{BaseOneServerPerSuite, PlaySpec}
 import play.api.libs.ws.ahc.StandaloneAhcWSClient
@@ -73,10 +76,39 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
   }
 
   "findPets with query parameters" in {
-    forAll(minSuccessful(100)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
+    forAll(minSuccessful(300)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
       val tags = tagsSet.map(_.toList)
       await(fakeClient.findPets(pager, tags, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
     }
+  }
+
+  "updatePetWithForm" in {
+    forAll(for {
+      id <- Gen.oneOf(-1l, 0l, 1l)
+      name <- Gen.alphaStr
+      status <- Gen.option(Gen.oneOf(PetTag.values.toIndexedSeq).map(_.toString))
+    } yield (id, name, status), minSuccessful(300)) { case (id, name, maybeStatus) =>
+      await(fakeClient.updatePetWithForm(id, name, maybeStatus, UserModel.Admin)) must be(UpdatePetWithFormOk(petForm(id, name, maybeStatus)))
+    }
+  }
+
+  "uploadFile" in {
+    val petId = 2l
+    val additionalMetadata = getRandomString(100)
+    val content = getRandomString(20).getBytes("UTF-8")
+    val tmpFile = Files.createTempFile(null, null)
+    Files.write(tmpFile, content)
+    await(fakeClient.uploadFile(petId, Some(additionalMetadata), tmpFile.toFile, UserModel.Admin)) match {
+      case UploadFileOk(body) =>
+        body.code must be(Some(200))
+        body.`type` must be(Some(additionalMetadata))
+        body.message.map(
+          file => Files.readAllBytes(Paths.get(file))
+        ).getOrElse(Array.emptyByteArray) must be(content)
+      case other =>
+        fail(s"Wrong response class (${other.getClass.getName})")
+    }
+    Files.delete(tmpFile)
   }
 
 }
