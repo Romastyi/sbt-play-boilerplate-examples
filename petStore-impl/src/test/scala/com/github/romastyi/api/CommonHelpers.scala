@@ -1,7 +1,7 @@
 package com.github.romastyi.api
 
 import java.io.File
-import java.nio.file.{StandardCopyOption, Files}
+import java.nio.file.{Files, StandardCopyOption}
 
 import com.github.romastyi.api.domain.{UserJwtSession, UserModel}
 import com.github.romastyi.api.model.{ApiResponse, NewPet, Pet, PetTag}
@@ -67,18 +67,20 @@ trait CommonHelpers extends FakeApplicationFactory {
 
   def getRandomString(length: Int): String = Random.alphanumeric.take(length).mkString("")
 
+  def getTraceId: String = getRandomString(32)
+
   def mockService: PetStoreService[Future] = new PetStoreService[Future] {
-    override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], logged: UserModel): Future[FindPetsResponse] = {
+    override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], traceId: String, logged: UserModel): Future[FindPetsResponse] = {
       Future.successful(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
     }
-    override def addPet(pet: NewPet, logged: UserModel): Future[AddPetResponse] = ???
-    override def findPetById(id: Long, logged: UserModel): Future[FindPetByIdResponse] = ???
-    override def deletePet(id: Long, logged: UserModel): Future[DeletePetResponse] = ???
-    override def findPetByTag(tag: FindPetByTagTag.Value, logged: UserModel): Future[FindPetByTagResponse] = ???
-    override def updatePetWithForm(id: Long, name: String, status: Option[String], logged: UserModel): Future[UpdatePetWithFormResponse] = {
+    override def addPet(pet: NewPet, traceId: String, logged: UserModel): Future[AddPetResponse] = ???
+    override def findPetById(id: Long, traceId: String, logged: UserModel): Future[FindPetByIdResponse] = ???
+    override def deletePet(id: Long, traceId: String, logged: UserModel): Future[DeletePetResponse] = ???
+    override def findPetByTag(tag: FindPetByTagTag.Value, traceId: String, logged: UserModel): Future[FindPetByTagResponse] = ???
+    override def updatePetWithForm(id: Long, name: String, status: Option[String], traceId: String, logged: UserModel): Future[UpdatePetWithFormResponse] = {
       Future.successful(UpdatePetWithFormOk(petForm(id, name, status)))
     }
-    override def uploadFile(petId: Long, additionalMetadata: Option[String], file: File, logged: UserModel): Future[UploadFileResponse] = {
+    override def uploadFile(petId: Long, additionalMetadata: Option[String], file: File, traceId: String, logged: UserModel): Future[UploadFileResponse] = {
       val tmpFile = Files.createTempFile(s"test-$petId-${getRandomString(20)}", ".tmp")
       Future.successful(UploadFileOk(ApiResponse(
         code = Some(200),

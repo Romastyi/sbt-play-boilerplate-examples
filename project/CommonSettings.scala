@@ -127,7 +127,9 @@ object CommonSettings {
     .settings(common: _ *)
     .settings(
       generatorDestPackage := "com.github.romastyi.api",
-      securityProviders := Seq(JwtSecurityProvider)
+      securityProviders := Seq(JwtSecurityProvider),
+      useTraceId := true,
+      traceIdHeader := Some("X-Trace-ID")
     )
 
   def MyImplProject(name: String, dir: File, api: Project): Project = ImplProject(name, dir, api)(PlayVersion)
@@ -138,6 +140,8 @@ object CommonSettings {
       generators ++= Seq(Generators.injectedController, Generators.sirdRoutes),
       securityProviders := Seq(JwtSecurityProvider),
       injectionProvider := ScaldiInjectionProvider,
+      useTraceId := true,
+      traceIdHeader := Some("X-Trace-ID"),
       javaOptions in Runtime += "-Dconfig.file=" + (baseDirectory.value / "resources" / "reference.conf").getAbsolutePath
     )
     .enablePlugins(PlayScala)

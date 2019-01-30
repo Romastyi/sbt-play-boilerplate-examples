@@ -78,7 +78,7 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
   "findPets with query parameters" in {
     forAll(minSuccessful(300)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
       val tags = tagsSet.map(_.toList)
-      await(fakeClient.findPets(pager, tags, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
+      await(fakeClient.findPets(pager, tags, getTraceId, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
     }
   }
 
@@ -88,7 +88,7 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
       name <- Gen.alphaStr
       status <- Gen.option(Gen.oneOf(PetTag.values.toIndexedSeq).map(_.toString))
     } yield (id, name, status), minSuccessful(300)) { case (id, name, maybeStatus) =>
-      await(fakeClient.updatePetWithForm(id, name, maybeStatus, UserModel.Admin)) must be(UpdatePetWithFormOk(petForm(id, name, maybeStatus)))
+      await(fakeClient.updatePetWithForm(id, name, maybeStatus, getTraceId, UserModel.Admin)) must be(UpdatePetWithFormOk(petForm(id, name, maybeStatus)))
     }
   }
 
@@ -98,7 +98,7 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
     val content = getRandomString(20).getBytes("UTF-8")
     val tmpFile = Files.createTempFile(null, null)
     Files.write(tmpFile, content)
-    await(fakeClient.uploadFile(petId, Some(additionalMetadata), tmpFile.toFile, UserModel.Admin)) match {
+    await(fakeClient.uploadFile(petId, Some(additionalMetadata), tmpFile.toFile, getTraceId, UserModel.Admin)) match {
       case UploadFileOk(body) =>
         body.code must be(Some(200))
         body.`type` must be(Some(additionalMetadata))
