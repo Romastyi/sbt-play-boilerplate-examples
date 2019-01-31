@@ -37,7 +37,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
       pager.limit.filter(_ >= 0).toList.map(takeN)
     )
 
-    Future.successful(FindPetsOk(modifiers(pets).toList))
+    Future.successful(FindPetsOk(modifiers(pets).toList, traceId))
 
   }
 
@@ -51,7 +51,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
   override def addPet(pet: NewPet, traceId: String, logged: UserModel): Future[AddPetResponse] = {
     val petToAdd = Pet(ids.incrementAndGet(), pet.name, pet.tag)
     pets = pets :+ petToAdd
-    Future.successful(AddPetOk(petToAdd))
+    Future.successful(AddPetOk(petToAdd, traceId))
   }
 
   /**
@@ -64,7 +64,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
   override def deletePet(id: Long, traceId: String, logged: UserModel): Future[DeletePetResponse] = {
     pets.find(_.id == id).get
     pets = pets.filter(_.id != id)
-    Future.successful(DeletePetNoContent)
+    Future.successful(DeletePetNoContent(traceId))
   }
 
   /**
@@ -76,8 +76,8 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
     */
   override def findPetById(id: Long, traceId: String, logged: UserModel): Future[FindPetByIdResponse] = {
     Future.successful(
-      pets.find(_.id == id).map(FindPetByIdOk).getOrElse(
-        FindPetByIdDefault(ErrorModel(100, s"Pet with ID $id not found!", None, java.util.UUID.randomUUID()), 400)
+      pets.find(_.id == id).map(FindPetByIdOk(_, traceId)).getOrElse(
+        FindPetByIdDefault(ErrorModel(100, s"Pet with ID $id not found!", None, java.util.UUID.randomUUID()), 400, traceId)
       )
     )
   }
@@ -90,7 +90,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
     * @param logged Current logged user
     */
   override def findPetByTag(tag: FindPetByTagTag.Value, traceId: String, logged: UserModel): Future[FindPetByTagResponse] = {
-    Future.successful(FindPetByTagOk(pets.find(_.tag.getOrElse(Nil).contains(tag)).get))
+    Future.successful(FindPetByTagOk(pets.find(_.tag.getOrElse(Nil).contains(tag)).get, traceId))
   }
 
   /**
@@ -107,7 +107,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
       id = id,
       name = name,
       tag = status.map(PetTag.withName).map(List(_))
-    )))
+    ), traceId))
   }
 
   /**
@@ -124,7 +124,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
       code = Some(200),
       `type` = additionalMetadata,
       message = None
-    )))
+    ), traceId))
   }
 
 }

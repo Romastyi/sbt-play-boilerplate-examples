@@ -35,9 +35,9 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
 
   private def getPetList(user: UserModel): Future[Either[String, List[Pet]]] = {
     petStore.findPets(FindPetsPager(drop = Some(0), limit = None), None, traceId, user).map {
-      case FindPetsOk(list) =>
+      case FindPetsOk(list, _) =>
         Right(list)
-      case FindPetsDefault(error, code) =>
+      case FindPetsDefault(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")
       case UnexpectedResult(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")
@@ -58,9 +58,9 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
 
   private def createNewPet(newPet: NewPet, user: UserModel): Future[Either[String, Pet]] = {
     petStore.addPet(newPet, traceId, user).map {
-      case AddPetOk(pet) =>
+      case AddPetOk(pet, _) =>
         Right(pet)
-      case AddPetDefault(error, code) =>
+      case AddPetDefault(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")
       case UnexpectedResult(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")
@@ -86,9 +86,9 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
 
   private def deletePet(id: Long, user: UserModel): Future[Either[String, Unit]] = {
     petStore.deletePet(id, traceId, user).map {
-      case DeletePetNoContent =>
+      case DeletePetNoContent(_) =>
         Right(())
-      case DeletePetDefault(error, code) =>
+      case DeletePetDefault(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")
       case UnexpectedResult(error, code, _) =>
         Left(s"STATUS: $code, ERROR: $error")

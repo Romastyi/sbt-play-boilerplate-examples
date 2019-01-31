@@ -71,14 +71,14 @@ trait CommonHelpers extends FakeApplicationFactory {
 
   def mockService: PetStoreService[Future] = new PetStoreService[Future] {
     override def findPets(pager: FindPetsPager, tags: Option[List[FindPetsTags.Value]], traceId: String, logged: UserModel): Future[FindPetsResponse] = {
-      Future.successful(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
+      Future.successful(FindPetsOk(allPets.filterByTags(tags).withPager(pager), traceId))
     }
     override def addPet(pet: NewPet, traceId: String, logged: UserModel): Future[AddPetResponse] = ???
     override def findPetById(id: Long, traceId: String, logged: UserModel): Future[FindPetByIdResponse] = ???
     override def deletePet(id: Long, traceId: String, logged: UserModel): Future[DeletePetResponse] = ???
     override def findPetByTag(tag: FindPetByTagTag.Value, traceId: String, logged: UserModel): Future[FindPetByTagResponse] = ???
     override def updatePetWithForm(id: Long, name: String, status: Option[String], traceId: String, logged: UserModel): Future[UpdatePetWithFormResponse] = {
-      Future.successful(UpdatePetWithFormOk(petForm(id, name, status)))
+      Future.successful(UpdatePetWithFormOk(petForm(id, name, status), traceId))
     }
     override def uploadFile(petId: Long, additionalMetadata: Option[String], file: File, traceId: String, logged: UserModel): Future[UploadFileResponse] = {
       val tmpFile = Files.createTempFile(s"test-$petId-${getRandomString(20)}", ".tmp")
@@ -86,7 +86,7 @@ trait CommonHelpers extends FakeApplicationFactory {
         code = Some(200),
         `type` = additionalMetadata,
         message = Some(Files.move(file.toPath, tmpFile, StandardCopyOption.REPLACE_EXISTING).toAbsolutePath.toString)
-      )))
+      ), traceId))
     }
   }
 

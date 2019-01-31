@@ -78,7 +78,9 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
   "findPets with query parameters" in {
     forAll(minSuccessful(300)) { (pager: FindPetsPager, tagsSet: Option[Set[FindPetsTags.Value]]) =>
       val tags = tagsSet.map(_.toList)
-      await(fakeClient.findPets(pager, tags, getTraceId, UserModel.Admin)) must be(FindPetsOk(allPets.filterByTags(tags).withPager(pager)))
+      val traceId = getTraceId
+      val pets = allPets.filterByTags(tags).withPager(pager)
+      await(fakeClient.findPets(pager, tags, traceId, UserModel.Admin)) must be(FindPetsOk(pets, traceId))
     }
   }
 
@@ -88,23 +90,26 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
       name <- Gen.alphaStr
       status <- Gen.option(Gen.oneOf(PetTag.values.toIndexedSeq).map(_.toString))
     } yield (id, name, status), minSuccessful(300)) { case (id, name, maybeStatus) =>
-      await(fakeClient.updatePetWithForm(id, name, maybeStatus, getTraceId, UserModel.Admin)) must be(UpdatePetWithFormOk(petForm(id, name, maybeStatus)))
+      val traceId = getTraceId
+      await(fakeClient.updatePetWithForm(id, name, maybeStatus, traceId, UserModel.Admin)) must be(UpdatePetWithFormOk(petForm(id, name, maybeStatus), traceId))
     }
   }
 
   "uploadFile" in {
     val petId = 2l
+    val traceId = getTraceId
     val additionalMetadata = getRandomString(100)
     val content = getRandomString(20).getBytes("UTF-8")
     val tmpFile = Files.createTempFile(null, null)
     Files.write(tmpFile, content)
-    await(fakeClient.uploadFile(petId, Some(additionalMetadata), tmpFile.toFile, getTraceId, UserModel.Admin)) match {
-      case UploadFileOk(body) =>
+    await(fakeClient.uploadFile(petId, Some(additionalMetadata), tmpFile.toFile, traceId, UserModel.Admin)) match {
+      case UploadFileOk(body, responseTraceId) =>
         body.code must be(Some(200))
         body.`type` must be(Some(additionalMetadata))
         body.message.map(
           file => Files.readAllBytes(Paths.get(file))
         ).getOrElse(Array.emptyByteArray) must be(content)
+        responseTraceId must be(traceId)
       case other =>
         fail(s"Wrong response class (${other.getClass.getName})")
     }
