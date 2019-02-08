@@ -12,7 +12,7 @@ object CommonSettings {
 
   val Version = "0.0.4"
   val PlayVersion: String = play.core.PlayVersion.current
-  val SilhouetteVersion = "5.0.0"
+  val SilhouetteVersion = "5.0.7"
 
   val common: Seq[Def.SettingsDefinition] = Seq(
     organization := "com.github.romastyi",
