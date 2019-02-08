@@ -1,14 +1,12 @@
 package com.github.romastyi.controller
 
-import java.util.UUID
-
 import com.github.romastyi.api.domain.{UserModel, UserRole}
 import com.github.romastyi.api.model.{NewPet, Pet}
 import com.github.romastyi.api.service.PetStoreService
 import com.github.romastyi.api.silhouette.{SessionEnv, WithRoles}
 import com.mohiva.play.silhouette.api.Silhouette
-import play.api.data._
 import play.api.data.Forms._
+import play.api.data._
 import play.api.mvc._
 import scaldi.{Injectable, Injector}
 
@@ -31,10 +29,8 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
     )
   }
 
-  private def traceId: String = UUID.randomUUID().toString
-
   private def getPetList(user: UserModel): Future[Either[String, List[Pet]]] = {
-    petStore.findPets(FindPetsPager(drop = Some(0), limit = None), None, traceId, user).map {
+    petStore.findPets(FindPetsPager(drop = Some(0), limit = None), None, user).map {
       case FindPetsOk(list, _) =>
         Right(list)
       case FindPetsDefault(error, code, _) =>
@@ -57,7 +53,7 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
   }
 
   private def createNewPet(newPet: NewPet, user: UserModel): Future[Either[String, Pet]] = {
-    petStore.addPet(newPet, traceId, user).map {
+    petStore.addPet(newPet, user).map {
       case AddPetOk(pet, _) =>
         Right(pet)
       case AddPetDefault(error, code, _) =>
@@ -85,7 +81,7 @@ class PetStoreController(implicit val inj: Injector) extends InjectedController 
   }
 
   private def deletePet(id: Long, user: UserModel): Future[Either[String, Unit]] = {
-    petStore.deletePet(id, traceId, user).map {
+    petStore.deletePet(id, user).map {
       case DeletePetNoContent(_) =>
         Right(())
       case DeletePetDefault(error, code, _) =>
