@@ -16,7 +16,7 @@ object CommonSettings {
 
   val common: Seq[Def.SettingsDefinition] = Seq(
     organization := "com.github.romastyi",
-    scalaVersion := "2.12.4",
+    scalaVersion := "2.12.8",
     version := PlayVersion + "_" + Version,
     scalacOptions ++= Seq(
       "-feature",

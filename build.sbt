@@ -13,7 +13,7 @@ lazy val `api` = project.in(file("api"))
       // Consul service discovery
       consul,
       // JWT
-      "com.pauldijou" %% "jwt-play" % "0.14.1",
+      "com.pauldijou" %% "jwt-json-common-legacy" % "1.1.0",
       // silhouette
       "com.mohiva" %% "play-silhouette" % SilhouetteVersion,
       "com.mohiva" %% "play-silhouette-password-bcrypt" % SilhouetteVersion,
