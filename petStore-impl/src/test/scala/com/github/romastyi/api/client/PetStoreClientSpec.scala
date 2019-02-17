@@ -26,6 +26,7 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
 
   import PetStoreController._
   import PetStoreService._
+  import PetStoreClient._
 
   def fakeClient: PetStoreClient = {
     implicit val sys: ActorSystem = app.injector.instanceOf[ActorSystem]
@@ -51,9 +52,8 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
 
   "FindPetsPager render" in {
     forAll { pager: FindPetsPager =>
-      val renderer = fakeClient.FindPetsPagerQueryParameter
       val bindable = FindPetsPagerQueryBindable
-      val query = renderer.render("pager", pager)
+      val query = FindPetsPagerQueryParameter.render("pager", pager)
       val params = parseQueryParams(query)
       query must be(trimAmp(bindable.unbind("pager", pager)))
       bindable.bind("pager", params) must be(Some(Right(pager.copy(
@@ -67,7 +67,7 @@ class PetStoreClientSpec extends PlaySpec with BaseOneServerPerSuite with Proper
 
   "FindPetsTags render" in {
     forAll { tags: Option[List[FindPetsTags.Value]] =>
-      val renderer: QueryParameter[Option[List[FindPetsTags.Value]]] = QueryParameter.optionQueryParameter(fakeClient.FindPetsTagsValueListQueryParameter)
+      val renderer: QueryParameter[Option[List[FindPetsTags.Value]]] = QueryParameter.optionQueryParameter(FindPetsTagsValueListQueryParameter)
       val bindable: QueryStringBindable[Option[List[FindPetsTags.Value]]] = QueryStringBindable.bindableOption[List[FindPetsTags.Value]]
       val query = renderer.render("tags", tags)
       val params = parseQueryParams(query)
