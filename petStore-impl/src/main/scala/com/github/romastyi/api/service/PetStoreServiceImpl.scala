@@ -6,6 +6,7 @@ package com.github.romastyi.api.service
 
 import com.github.romastyi.api.domain.UserModel
 import com.github.romastyi.api.model._
+import play.api.Logger
 import play.boilerplate.api.Tracer
 
 import scala.collection.mutable.{Seq => MSeq}
@@ -15,6 +16,7 @@ object PetStoreServiceImpl extends PetStoreService[Future] {
 
   import PetStoreService._
 
+  private val logger = Logger(this.getClass)
   private val ids = new java.util.concurrent.atomic.AtomicLong(0l)
   private var pets: MSeq[Pet] = MSeq.empty
 
